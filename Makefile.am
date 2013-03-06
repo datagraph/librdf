@@ -5,6 +5,7 @@ LDADD           = librdf++.la
 lib_LTLIBRARIES = librdf++.la
 
 librdf___la_SOURCES =     \
+  extern.cc               \
   feature.cc              \
   format.cc               \
   module.cc               \
@@ -18,6 +19,7 @@ librdf___la_SOURCES =     \
 base_pkgincludedir = $(includedir)/rdf++
 
 base_pkginclude_HEADERS = \
+  extern.h                \
   feature.h               \
   format.h                \
   module.h                \
