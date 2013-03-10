@@ -5,7 +5,11 @@
 #endif
 
 #include "rdf++/writer.h"
+
+#include "rdf++/quad.h"
 #include "rdf++/raptor.h"
+#include "rdf++/term.h"
+#include "rdf++/triple.h"
 
 #include <cassert>   /* for assert() */
 #include <new>       /* for std::bad_alloc */
@@ -31,6 +35,10 @@ class writer::implementation : private boost::noncopyable {
 
     void flush();
 
+    void write_triple(const triple& triple);
+
+    void write_quad(const quad& quad);
+
   private:
     std::ostream& _stream;
     const std::string _content_type;
@@ -40,6 +48,10 @@ class writer::implementation : private boost::noncopyable {
     raptor_iostream* _iostream = nullptr;
     raptor_serializer* _serializer = nullptr;
     raptor_statement* _statement = nullptr;
+
+    raptor_term* make_raptor_term(rdf::term* term);
+
+    void write_statement();
 };
 
 writer::implementation::implementation(std::ostream& stream,
@@ -144,6 +156,56 @@ writer::implementation::flush() {
   }
 }
 
+raptor_term*
+writer::implementation::make_raptor_term(rdf::term* term) {
+  assert(term != nullptr);
+
+  // TODO
+/*
+  switch (term->type) {
+    case none:
+      break;
+  }
+*/
+
+  return nullptr;
+}
+
+void
+writer::implementation::write_statement() {
+  const int rc = raptor_serializer_serialize_statement(_serializer, _statement);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_serialize_statement() failed");
+  }
+}
+
+void
+writer::implementation::write_triple(const triple& triple) {
+  raptor_statement_clear(_statement);
+
+  _statement->subject   = make_raptor_term((rdf::term*)&triple.subject);
+  _statement->predicate = make_raptor_term((rdf::term*)&triple.predicate);
+  _statement->object    = make_raptor_term((rdf::term*)&triple.object);
+
+  write_statement();
+
+  raptor_statement_clear(_statement);
+}
+
+void
+writer::implementation::write_quad(const quad& quad) {
+  raptor_statement_clear(_statement);
+
+  _statement->subject   = make_raptor_term((rdf::term*)&quad.subject);
+  _statement->predicate = make_raptor_term((rdf::term*)&quad.predicate);
+  _statement->object    = make_raptor_term((rdf::term*)&quad.object);
+  _statement->graph     = make_raptor_term((rdf::term*)&quad.context);
+
+  write_statement();
+
+  raptor_statement_clear(_statement);
+}
+
 writer::writer(std::ostream& stream,
                const std::string& content_type,
                const std::string& charset,
@@ -178,10 +240,12 @@ writer::flush() {
 
 void
 writer::write_triple(const triple& triple) {
-  (void)triple; // TODO
+  assert(_implementation != nullptr);
+  _implementation->write_triple(triple);
 }
 
 void
 writer::write_quad(const quad& quad) {
-  (void)quad; // TODO
+  assert(_implementation != nullptr);
+  _implementation->write_quad(quad);
 }
