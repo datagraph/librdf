@@ -17,6 +17,7 @@ using namespace rdf;
 class writer::implementation : private boost::noncopyable {
   public:
     implementation(
+      std::ostream& stream,
       const std::string& content_type,
       const std::string& charset,
       const std::string& base_uri);
@@ -24,6 +25,7 @@ class writer::implementation : private boost::noncopyable {
     ~implementation();
 
   private:
+    std::ostream& _stream;
     const std::string _content_type;
     const std::string _charset;
     raptor_world* _world = nullptr;
@@ -32,10 +34,12 @@ class writer::implementation : private boost::noncopyable {
     raptor_statement* _statement = nullptr;
 };
 
-writer::implementation::implementation(const std::string& content_type,
+writer::implementation::implementation(std::ostream& stream,
+                                       const std::string& content_type,
                                        const std::string& charset,
                                        const std::string& base_uri)
-  : _content_type(content_type),
+  : _stream(stream),
+    _content_type(content_type),
     _charset(charset) {
 
   _world = raptor_new_world();
@@ -95,9 +99,41 @@ writer::implementation::~implementation() {
   }
 }
 
-writer::writer(const std::string& content_type,
+writer::writer(std::ostream& stream,
+               const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(new writer::implementation(content_type, charset, base_uri)) {}
+  : _implementation(new writer::implementation(stream, content_type, charset, base_uri)) {}
 
 writer::~writer() = default;
+
+void
+writer::define_prefix(const std::string& prefix,
+                      const std::string& uri_string) {
+  (void)prefix, (void)uri_string; // TODO
+}
+
+void
+writer::begin() {
+  // TODO
+}
+
+void
+writer::finish() {
+  // TODO
+}
+
+void
+writer::flush() {
+  // TODO
+}
+
+void
+writer::write_triple(const triple& triple) {
+  (void)triple; // TODO
+}
+
+void
+writer::write_quad(const quad& quad) {
+  (void)quad; // TODO
+}
