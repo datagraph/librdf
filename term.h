@@ -33,6 +33,8 @@ namespace rdf {
       term()
         : type(term_type::none), string() {}
 
+      virtual ~term() = default;
+
     protected:
       term(const term_type type, const std::string& string)
         : type(type), string(string) {}
