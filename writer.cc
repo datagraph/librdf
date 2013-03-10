@@ -191,7 +191,7 @@ writer::implementation::make_raptor_term(const rdf::term_position pos,
 
     case rdf::term_type::plain_literal: {
       assert(pos == rdf::term_position::object);
-      const auto literal = dynamic_cast<const rdf::plain_literal&>(term);
+      const rdf::plain_literal& literal = dynamic_cast<const rdf::plain_literal&>(term);
       return raptor_new_term_from_literal(_world,
         reinterpret_cast<const unsigned char*>(literal.string.c_str()),
         nullptr,
@@ -201,7 +201,7 @@ writer::implementation::make_raptor_term(const rdf::term_position pos,
 
     case rdf::term_type::typed_literal: {
       assert(pos == rdf::term_position::object);
-      const auto literal = dynamic_cast<const rdf::typed_literal&>(term);
+      const rdf::typed_literal& literal = dynamic_cast<const rdf::typed_literal&>(term);
       return raptor_new_term_from_literal(_world,
         reinterpret_cast<const unsigned char*>(literal.string.c_str()),
         raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(literal.datatype_uri.c_str())),
