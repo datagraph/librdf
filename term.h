@@ -5,6 +5,8 @@
 
 #include <string> /* for std::string */
 
+#include <boost/noncopyable.hpp>
+
 namespace rdf {
   enum class term_type : int {
     none = 0,
@@ -25,7 +27,7 @@ namespace rdf {
   /**
    * Base class for RDF terms.
    */
-  struct term {
+  struct term : private boost::noncopyable {
     public:
       const term_type type;
       std::string string;
@@ -89,6 +91,8 @@ namespace rdf {
         : term(term_type::typed_literal, lexical_form),
           datatype_uri(datatype_uri) {}
   };
+
+  extern const term default_context;
 }
 
 #endif /* RDFXX_TERM_H */

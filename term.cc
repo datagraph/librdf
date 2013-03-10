@@ -7,3 +7,5 @@
 #include "rdf++/term.h"
 
 using namespace rdf;
+
+extern const term default_context;
