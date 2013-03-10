@@ -8,9 +8,9 @@
 namespace rdf {
   struct triple {
     public:
-      term subject;
-      term predicate;
-      term object;
+      const term& subject;
+      const term& predicate;
+      const term& object;
 
       triple(const term& subject, const term& predicate, const term& object)
         : subject(subject),

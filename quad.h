@@ -8,16 +8,16 @@
 namespace rdf {
   struct quad {
     public:
-      term subject;
-      term predicate;
-      term object;
-      term context;
+      const term& subject;
+      const term& predicate;
+      const term& object;
+      const term& context;
 
       quad(const term& subject, const term& predicate, const term& object)
         : subject(subject),
           predicate(predicate),
           object(object),
-          context() {}
+          context(rdf::default_context) {}
 
       quad(const term& subject, const term& predicate, const term& object, const term& context)
         : subject(subject),
