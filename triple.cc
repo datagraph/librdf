@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/triple.h"
+
+using namespace rdf;

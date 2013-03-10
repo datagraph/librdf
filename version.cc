@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/version.h"
+
+using namespace rdf;

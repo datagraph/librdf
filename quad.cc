@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/quad.h"
+
+using namespace rdf;

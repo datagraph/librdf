@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/module.h"
+
+using namespace rdf;

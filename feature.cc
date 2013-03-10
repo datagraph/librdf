@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/feature.h"
+
+using namespace rdf;

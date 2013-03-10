@@ -5,3 +5,5 @@
 #endif
 
 #include "rdf++/format.h"
+
+using namespace rdf;
