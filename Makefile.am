@@ -10,6 +10,7 @@ librdf___la_SOURCES =     \
   format.cc               \
   module.cc               \
   quad.cc                 \
+  raptor.cc               \
   reader.cc               \
   term.cc                 \
   triple.cc               \
