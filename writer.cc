@@ -12,6 +12,7 @@
 #include "rdf++/triple.h"
 
 #include <cassert>   /* for assert() */
+#include <iostream>  /* for std::cerr, std::endl */
 #include <new>       /* for std::bad_alloc */
 #include <stdexcept> /* for std::invalid_argument, std::runtime_error */
 
@@ -54,6 +55,14 @@ class writer::implementation : private boost::noncopyable {
     void write_statement();
 };
 
+static void
+log_handler(void* const user_data,
+            raptor_log_message* const message) {
+  (void)user_data;
+  assert(message != nullptr);
+  std::cerr << "libraptor2: " << message->text << std::endl;
+}
+
 writer::implementation::implementation(std::ostream& stream,
                                        const std::string& content_type,
                                        const std::string& charset,
@@ -66,6 +75,10 @@ writer::implementation::implementation(std::ostream& stream,
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
   }
+
+#if 1
+  raptor_world_set_log_handler(_world, nullptr, log_handler);
+#endif
 
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());
   if (_base_uri == nullptr) {
