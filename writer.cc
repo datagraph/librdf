@@ -5,6 +5,7 @@
 #endif
 
 #include "rdf++/writer.h"
+#include "rdf++/raptor.h"
 
 #include <cassert>   /* for assert() */
 #include <new>       /* for std::bad_alloc */
@@ -24,12 +25,19 @@ class writer::implementation : private boost::noncopyable {
 
     ~implementation();
 
+    void begin();
+
+    void finish();
+
+    void flush();
+
   private:
     std::ostream& _stream;
     const std::string _content_type;
     const std::string _charset;
     raptor_world* _world = nullptr;
     raptor_uri* _base_uri = nullptr;
+    raptor_iostream* _iostream = nullptr;
     raptor_serializer* _serializer = nullptr;
     raptor_statement* _statement = nullptr;
 };
@@ -53,6 +61,13 @@ writer::implementation::implementation(std::ostream& stream,
     throw std::bad_alloc(); /* out of memory */
   }
 
+  _iostream = raptor_new_iostream_from_std_ostream(_world, &_stream);
+  if (_iostream == nullptr) {
+    raptor_free_uri(_base_uri), _base_uri = nullptr;
+    raptor_free_world(_world), _world = nullptr;
+    throw std::bad_alloc(); /* out of memory */
+  }
+
   std::string serializer_name("nquads"); // TODO
 /*
   for (unsigned int i = 0; i < rdf_format_count; i++) {
@@ -67,6 +82,7 @@ writer::implementation::implementation(std::ostream& stream,
 
   _serializer = raptor_new_serializer(_world, serializer_name.c_str());
   if (_serializer == nullptr) {
+    raptor_free_iostream(_iostream), _iostream = nullptr;
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -75,6 +91,7 @@ writer::implementation::implementation(std::ostream& stream,
   _statement = raptor_new_statement(_world);
   if (_statement == nullptr) {
     raptor_free_serializer(_serializer), _serializer = nullptr;
+    raptor_free_iostream(_iostream), _iostream = nullptr;
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -90,12 +107,40 @@ writer::implementation::~implementation() {
     raptor_free_serializer(_serializer), _serializer = nullptr;
   }
 
+  if (_iostream != nullptr) {
+    raptor_free_iostream(_iostream), _iostream = nullptr;
+  }
+
   if (_base_uri != nullptr) {
     raptor_free_uri(_base_uri), _base_uri = nullptr;
   }
 
   if (_world != nullptr) {
     raptor_free_world(_world), _world = nullptr;
+  }
+}
+
+void
+writer::implementation::begin() {
+  const int rc = raptor_serializer_start_to_iostream(_serializer, _base_uri, _iostream);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_start_to_iostream() failed");
+  }
+}
+
+void
+writer::implementation::finish() {
+  const int rc = raptor_serializer_serialize_end(_serializer);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_serialize_end() failed");
+  }
+}
+
+void
+writer::implementation::flush() {
+  const int rc = raptor_serializer_flush(_serializer);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_flush() failed");
   }
 }
 
@@ -115,17 +160,20 @@ writer::define_prefix(const std::string& prefix,
 
 void
 writer::begin() {
-  // TODO
+  assert(_implementation != nullptr);
+  _implementation->begin();
 }
 
 void
 writer::finish() {
-  // TODO
+  assert(_implementation != nullptr);
+  _implementation->finish();
 }
 
 void
 writer::flush() {
-  // TODO
+  assert(_implementation != nullptr);
+  _implementation->flush();
 }
 
 void
