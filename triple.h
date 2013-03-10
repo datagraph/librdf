@@ -3,19 +3,22 @@
 #ifndef RDFXX_TRIPLE_H
 #define RDFXX_TRIPLE_H
 
+#include <memory> /* for std::unique_ptr */
+
 #include "rdf++/term.h"
 
 namespace rdf {
   struct triple {
     public:
-      const term& subject;
-      const term& predicate;
-      const term& object;
+      std::unique_ptr<term> subject;
+      std::unique_ptr<term> predicate;
+      std::unique_ptr<term> object;
 
-      triple(const term& subject, const term& predicate, const term& object)
-        : subject(subject),
-          predicate(predicate),
-          object(object) {}
+      triple(term* subject, term* predicate, term* object);
+
+      triple(const term* subject, const term* predicate, const term* object);
+
+      triple(const term& subject, const term& predicate, const term& object);
   };
 }
 

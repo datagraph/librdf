@@ -224,9 +224,9 @@ void
 writer::implementation::write_triple(const triple& triple) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term(rdf::term_position::subject,   triple.subject);
-  _statement->predicate = make_raptor_term(rdf::term_position::predicate, triple.predicate);
-  _statement->object    = make_raptor_term(rdf::term_position::object,    triple.object);
+  _statement->subject   = make_raptor_term(rdf::term_position::subject,   *triple.subject);
+  _statement->predicate = make_raptor_term(rdf::term_position::predicate, *triple.predicate);
+  _statement->object    = make_raptor_term(rdf::term_position::object,    *triple.object);
 
   write_statement();
 
@@ -237,10 +237,12 @@ void
 writer::implementation::write_quad(const quad& quad) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term(rdf::term_position::subject,   quad.subject);
-  _statement->predicate = make_raptor_term(rdf::term_position::predicate, quad.predicate);
-  _statement->object    = make_raptor_term(rdf::term_position::object,    quad.object);
-  _statement->graph     = make_raptor_term(rdf::term_position::context,   quad.context);
+  _statement->subject   = make_raptor_term(rdf::term_position::subject,   *quad.subject);
+  _statement->predicate = make_raptor_term(rdf::term_position::predicate, *quad.predicate);
+  _statement->object    = make_raptor_term(rdf::term_position::object,    *quad.object);
+  if (quad.context != nullptr) {
+    _statement->graph   = make_raptor_term(rdf::term_position::context,   *quad.context);
+  }
 
   write_statement();
 

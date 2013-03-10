@@ -3,27 +3,25 @@
 #ifndef RDFXX_QUAD_H
 #define RDFXX_QUAD_H
 
+#include <memory> /* for std::unique_ptr */
+
 #include "rdf++/term.h"
 
 namespace rdf {
   struct quad {
     public:
-      const term& subject;
-      const term& predicate;
-      const term& object;
-      const term& context;
+      std::unique_ptr<term> subject;
+      std::unique_ptr<term> predicate;
+      std::unique_ptr<term> object;
+      std::unique_ptr<term> context;
 
-      quad(const term& subject, const term& predicate, const term& object)
-        : subject(subject),
-          predicate(predicate),
-          object(object),
-          context(*rdf::default_context) {}
+      quad(term* subject, term* predicate, term* object, term* context = nullptr);
 
-      quad(const term& subject, const term& predicate, const term& object, const term& context)
-        : subject(subject),
-          predicate(predicate),
-          object(object),
-          context(context) {}
+      quad(const term* subject, const term* predicate, const term* object, const term* context = nullptr);
+
+      quad(const term& subject, const term& predicate, const term& object);
+
+      quad(const term& subject, const term& predicate, const term& object, const term& context);
   };
 }
 
