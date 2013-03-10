@@ -49,7 +49,7 @@ class writer::implementation : private boost::noncopyable {
     raptor_serializer* _serializer = nullptr;
     raptor_statement* _statement = nullptr;
 
-    raptor_term* make_raptor_term(const rdf::term& term);
+    raptor_term* make_raptor_term(const rdf::term_position pos, const rdf::term& term);
 
     void write_statement();
 };
@@ -157,27 +157,46 @@ writer::implementation::flush() {
 }
 
 raptor_term*
-writer::implementation::make_raptor_term(const rdf::term& term) {
+writer::implementation::make_raptor_term(const rdf::term_position pos,
+                                         const rdf::term& term) {
   switch (term.type) {
-    case none:
-      throw std::invalid_argument("term.type cannot be none");
+    case rdf::term_type::none: { /* the default context only */
+      assert(pos == rdf::term_position::context);
+      return nullptr;
+    }
 
-    case uri:
+    case rdf::term_type::uri_reference: {
       return raptor_new_term_from_uri_string(_world,
-        reinterpret_cast<const unsigned char*>(term.value.c_str()));
+        reinterpret_cast<const unsigned char*>(term.string.c_str()));
+    }
 
-    case node:
+    case rdf::term_type::blank_node: {
+      assert(pos == rdf::term_position::subject || pos == rdf::term_position::object);
       return raptor_new_term_from_blank(_world,
-        reinterpret_cast<const unsigned char*>(term.value.c_str()));
+        reinterpret_cast<const unsigned char*>(term.string.c_str()));
+    }
 
-    case literal:
-      const bool is_datatyped = !(term.datatype.empty());
+    case rdf::term_type::plain_literal: {
+      assert(pos == rdf::term_position::object);
+      const auto literal = dynamic_cast<const rdf::plain_literal&>(term);
       return raptor_new_term_from_literal(_world,
-        reinterpret_cast<const unsigned char*>(term.value.c_str()),
-        is_datatyped ? raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(term.datatype.c_str())) : nullptr,
-        is_datatyped ? nullptr : reinterpret_cast<const unsigned char*>(term.language.c_str()));
+        reinterpret_cast<const unsigned char*>(literal.string.c_str()),
+        nullptr,
+        literal.language_tag.empty() ? nullptr :
+          reinterpret_cast<const unsigned char*>(literal.language_tag.c_str()));
+    }
+
+    case rdf::term_type::typed_literal: {
+      assert(pos == rdf::term_position::object);
+      const auto literal = dynamic_cast<const rdf::typed_literal&>(term);
+      return raptor_new_term_from_literal(_world,
+        reinterpret_cast<const unsigned char*>(literal.string.c_str()),
+        raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(literal.datatype_uri.c_str())),
+        nullptr);
+    }
   }
-  return nullptr; /* should never get here */
+  assert(false); /* should never get here */
+  return nullptr;
 }
 
 void
@@ -192,9 +211,9 @@ void
 writer::implementation::write_triple(const triple& triple) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term(*triple.subject);
-  _statement->predicate = make_raptor_term(*triple.predicate);
-  _statement->object    = make_raptor_term(*triple.object);
+  _statement->subject   = make_raptor_term(rdf::term_position::subject,   triple.subject);
+  _statement->predicate = make_raptor_term(rdf::term_position::predicate, triple.predicate);
+  _statement->object    = make_raptor_term(rdf::term_position::object,    triple.object);
 
   write_statement();
 
@@ -205,13 +224,10 @@ void
 writer::implementation::write_quad(const quad& quad) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term(*quad.subject);
-  _statement->predicate = make_raptor_term(*quad.predicate);
-  _statement->object    = make_raptor_term(*quad.object);
-
-  if (quad.context != nullptr) {
-    _statement->graph = make_raptor_term(*quad.context);
-  }
+  _statement->subject   = make_raptor_term(rdf::term_position::subject,   quad.subject);
+  _statement->predicate = make_raptor_term(rdf::term_position::predicate, quad.predicate);
+  _statement->object    = make_raptor_term(rdf::term_position::object,    quad.object);
+  _statement->graph     = make_raptor_term(rdf::term_position::context,   quad.context);
 
   write_statement();
 

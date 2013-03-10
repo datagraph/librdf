@@ -3,16 +3,16 @@
 #ifndef RDFXX_TRIPLE_H
 #define RDFXX_TRIPLE_H
 
-namespace rdf {
-  struct term;
+#include "rdf++/term.h"
 
+namespace rdf {
   struct triple {
     public:
-      term* subject   = nullptr;
-      term* predicate = nullptr;
-      term* object    = nullptr;
+      term subject;
+      term predicate;
+      term object;
 
-      triple(term* subject, term* predicate, term* object)
+      triple(const term& subject, const term& predicate, const term& object)
         : subject(subject),
           predicate(predicate),
           object(object) {}

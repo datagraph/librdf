@@ -3,22 +3,23 @@
 #ifndef RDFXX_QUAD_H
 #define RDFXX_QUAD_H
 
-namespace rdf {
-  struct term;
+#include "rdf++/term.h"
 
+namespace rdf {
   struct quad {
     public:
-      term* subject   = nullptr;
-      term* predicate = nullptr;
-      term* object    = nullptr;
-      term* context   = nullptr;
+      term subject;
+      term predicate;
+      term object;
+      term context;
 
-      quad(term* subject, term* predicate, term* object)
+      quad(const term& subject, const term& predicate, const term& object)
         : subject(subject),
           predicate(predicate),
-          object(object) {}
+          object(object),
+          context() {}
 
-      quad(term* subject, term* predicate, term* object, term* context)
+      quad(const term& subject, const term& predicate, const term& object, const term& context)
         : subject(subject),
           predicate(predicate),
           object(object),
