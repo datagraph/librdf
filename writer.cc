@@ -49,7 +49,7 @@ class writer::implementation : private boost::noncopyable {
     raptor_serializer* _serializer = nullptr;
     raptor_statement* _statement = nullptr;
 
-    raptor_term* make_raptor_term(rdf::term* term);
+    raptor_term* make_raptor_term(const rdf::term& term);
 
     void write_statement();
 };
@@ -157,18 +157,27 @@ writer::implementation::flush() {
 }
 
 raptor_term*
-writer::implementation::make_raptor_term(rdf::term* term) {
-  assert(term != nullptr);
-
-  // TODO
-/*
-  switch (term->type) {
+writer::implementation::make_raptor_term(const rdf::term& term) {
+  switch (term.type) {
     case none:
-      break;
-  }
-*/
+      throw std::invalid_argument("term.type cannot be none");
 
-  return nullptr;
+    case uri:
+      return raptor_new_term_from_uri_string(_world,
+        reinterpret_cast<const unsigned char*>(term.value.c_str()));
+
+    case node:
+      return raptor_new_term_from_blank(_world,
+        reinterpret_cast<const unsigned char*>(term.value.c_str()));
+
+    case literal:
+      const bool is_datatyped = !(term.datatype.empty());
+      return raptor_new_term_from_literal(_world,
+        reinterpret_cast<const unsigned char*>(term.value.c_str()),
+        is_datatyped ? raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(term.datatype.c_str())) : nullptr,
+        is_datatyped ? nullptr : reinterpret_cast<const unsigned char*>(term.language.c_str()));
+  }
+  return nullptr; /* should never get here */
 }
 
 void
@@ -183,9 +192,9 @@ void
 writer::implementation::write_triple(const triple& triple) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term((rdf::term*)&triple.subject);
-  _statement->predicate = make_raptor_term((rdf::term*)&triple.predicate);
-  _statement->object    = make_raptor_term((rdf::term*)&triple.object);
+  _statement->subject   = make_raptor_term(*triple.subject);
+  _statement->predicate = make_raptor_term(*triple.predicate);
+  _statement->object    = make_raptor_term(*triple.object);
 
   write_statement();
 
@@ -196,10 +205,13 @@ void
 writer::implementation::write_quad(const quad& quad) {
   raptor_statement_clear(_statement);
 
-  _statement->subject   = make_raptor_term((rdf::term*)&quad.subject);
-  _statement->predicate = make_raptor_term((rdf::term*)&quad.predicate);
-  _statement->object    = make_raptor_term((rdf::term*)&quad.object);
-  _statement->graph     = make_raptor_term((rdf::term*)&quad.context);
+  _statement->subject   = make_raptor_term(*quad.subject);
+  _statement->predicate = make_raptor_term(*quad.predicate);
+  _statement->object    = make_raptor_term(*quad.object);
+
+  if (quad.context != nullptr) {
+    _statement->graph = make_raptor_term(*quad.context);
+  }
 
   write_statement();
 
