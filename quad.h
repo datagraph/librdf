@@ -17,7 +17,7 @@ namespace rdf {
         : subject(subject),
           predicate(predicate),
           object(object),
-          context(rdf::default_context) {}
+          context(*rdf::default_context) {}
 
       quad(const term& subject, const term& predicate, const term& object, const term& context)
         : subject(subject),

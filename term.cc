@@ -8,4 +8,4 @@
 
 using namespace rdf;
 
-extern const term default_context;
+extern const term* const rdf::default_context = new term();

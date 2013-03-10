@@ -92,7 +92,7 @@ namespace rdf {
           datatype_uri(datatype_uri) {}
   };
 
-  extern const term default_context;
+  extern const term* const default_context;
 }
 
 #endif /* RDFXX_TERM_H */
