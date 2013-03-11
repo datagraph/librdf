@@ -3,9 +3,10 @@
 #ifndef RDFXX_READER_H
 #define RDFXX_READER_H
 
-#include <istream> /* for std::istream */
-#include <memory>  /* for std::unique_ptr */
-#include <string>  /* for std::string */
+#include <functional> /* for std::function */
+#include <istream>    /* for std::istream */
+#include <memory>     /* for std::unique_ptr */
+#include <string>     /* for std::string */
 
 #include <boost/noncopyable.hpp>
 
@@ -23,7 +24,9 @@ namespace rdf {
 
       ~reader();
 
-      void begin();
+      void read_triples(std::function<void (rdf::triple*)> callback);
+
+      void read_quads(std::function<void (rdf::quad*)> callback);
 
       void abort();
 

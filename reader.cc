@@ -30,7 +30,11 @@ class reader::implementation : private boost::noncopyable {
 
     ~implementation();
 
-    void begin();
+    void read();
+
+    void read_triples(std::function<void (rdf::triple*)> callback);
+
+    void read_quads(std::function<void (rdf::quad*)> callback);
 
     void abort();
 
@@ -47,6 +51,8 @@ class reader::implementation : private boost::noncopyable {
     raptor_iostream* _iostream = nullptr;
     raptor_parser* _parser = nullptr;
     raptor_statement* _statement = nullptr;
+    std::function<void (rdf::triple*)> _triple_callback;
+    std::function<void (rdf::quad*)> _quad_callback;
 };
 
 /**
@@ -125,16 +131,25 @@ reader::implementation::statement_callback(void* const user_data,
   assert(reader_impl != nullptr);
   assert(statement != nullptr);
 
+#if 0
   fprintf(stderr, "reader::implementation::statement_callback(%p, %p)\n", user_data, statement);
+#endif
 
   rdf::term* const subject   = copy_raptor_term(rdf::term_position::subject,   statement->subject);
   rdf::term* const predicate = copy_raptor_term(rdf::term_position::predicate, statement->predicate);
   rdf::term* const object    = copy_raptor_term(rdf::term_position::object,    statement->object);
-  rdf::term* const context   = copy_raptor_term(rdf::term_position::context,   statement->graph);
 
-  rdf::quad* quad = new rdf::quad(subject, predicate, object, context);
+  if (reader_impl->_quad_callback) {
+    rdf::term* const context = copy_raptor_term(rdf::term_position::context, statement->graph);
+    rdf::quad* quad = new rdf::quad(subject, predicate, object, context);
 
-  (void)quad; // TODO
+    reader_impl->_quad_callback(quad);
+  }
+  else if (reader_impl->_triple_callback) {
+    rdf::triple* triple = new rdf::triple(subject, predicate, object);
+
+    reader_impl->_triple_callback(triple);
+  }
 }
 
 reader::implementation::implementation(std::istream& stream,
@@ -210,11 +225,25 @@ reader::implementation::~implementation() {
 }
 
 void
-reader::implementation::begin() {
+reader::implementation::read() {
   const int rc = raptor_parser_parse_iostream(_parser, _iostream, _base_uri);
   if (rc != 0) {
     throw std::runtime_error("raptor_parser_parse_iostream() failed");
   }
+}
+
+void
+reader::implementation::read_triples(std::function<void (rdf::triple*)> callback) {
+  _triple_callback = callback;
+  _quad_callback   = nullptr;
+  read();
+}
+
+void
+reader::implementation::read_quads(std::function<void (rdf::quad*)> callback) {
+  _triple_callback = nullptr;
+  _quad_callback   = callback;
+  read();
 }
 
 void
@@ -232,9 +261,15 @@ reader::reader(std::istream& stream,
 reader::~reader() = default;
 
 void
-reader::begin() {
+reader::read_triples(std::function<void (rdf::triple*)> callback) {
   assert(_implementation != nullptr);
-  _implementation->begin();
+  _implementation->read_triples(callback);
+}
+
+void
+reader::read_quads(std::function<void (rdf::quad*)> callback) {
+  assert(_implementation != nullptr);
+  _implementation->read_quads(callback);
 }
 
 void
