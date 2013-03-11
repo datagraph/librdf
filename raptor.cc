@@ -51,6 +51,43 @@ std_iostream_write_bytes(void* const restrict user_data,
 }
 
 /**
+ * @see http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-read-bytes-func
+ */
+static int
+std_iostream_read_bytes(void* const restrict user_data,
+                        void* const restrict data,
+                        const size_t size,
+                        const size_t nmemb) {
+  std::istream* const stream = reinterpret_cast<std::istream*>(user_data);
+  assert(stream != nullptr);
+  assert(data != nullptr);
+  try {
+    if (stream->eof()) return 0;
+    const std::size_t byte_count = nmemb * size;
+    stream->read(reinterpret_cast<char*>(data), byte_count); // FIXME: partial reads?
+    return static_cast<int>(byte_count); /* success */
+  }
+  catch (const std::ios_base::failure& error) {
+    return -1; /* failure */
+  }
+}
+
+/**
+ * @see http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-read-eof-func
+ */
+static int
+std_iostream_read_eof(void* const user_data) {
+  std::istream* const stream = reinterpret_cast<std::istream*>(user_data);
+  assert(stream != nullptr);
+  try {
+    return stream->eof() ? 1 : 0;
+  }
+  catch (const std::ios_base::failure& error) {
+    return 1; /* failure: always indicate EOF */
+  }
+}
+
+/**
  * @see http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-handler
  */
 static const raptor_iostream_handler std_iostream_handler = {
@@ -60,12 +97,18 @@ static const raptor_iostream_handler std_iostream_handler = {
   /* .write_byte  = */ std_iostream_write_byte,
   /* .write_bytes = */ std_iostream_write_bytes,
   /* .write_end   = */ nullptr,
-  /* .read_bytes  = */ nullptr,
-  /* .read_eof    = */ nullptr
+  /* .read_bytes  = */ std_iostream_read_bytes,
+  /* .read_eof    = */ std_iostream_read_eof,
 };
 
 raptor_iostream*
+raptor_new_iostream_from_std_istream(raptor_world* world,
+                                     std::istream* stream) {
+  return raptor_new_iostream_from_handler(world, stream, &std_iostream_handler);
+}
+
+raptor_iostream*
 raptor_new_iostream_from_std_ostream(raptor_world* world,
-                                     std::ostream* ostream) {
-  return raptor_new_iostream_from_handler(world, ostream, &std_iostream_handler);
+                                     std::ostream* stream) {
+  return raptor_new_iostream_from_handler(world, stream, &std_iostream_handler);
 }

@@ -12,6 +12,7 @@
 #include "rdf++/triple.h"
 
 #include <cassert>   /* for assert() */
+#include <iostream>  /* for std::cerr, std::endl */
 #include <new>       /* for std::bad_alloc */
 #include <stdexcept> /* for std::invalid_argument, std::runtime_error */
 
@@ -35,9 +36,18 @@ class reader::implementation : private boost::noncopyable {
     const std::string _charset;
     raptor_world* _world = nullptr;
     raptor_uri* _base_uri = nullptr;
+    raptor_iostream* _iostream = nullptr;
     raptor_parser* _parser = nullptr;
     raptor_statement* _statement = nullptr;
 };
+
+static void
+log_handler(void* const user_data,
+            raptor_log_message* const message) {
+  (void)user_data;
+  assert(message != nullptr);
+  std::cerr << "libraptor2: " << message->text << std::endl;
+}
 
 reader::implementation::implementation(std::istream& stream,
                                        const std::string& content_type,
@@ -52,8 +62,19 @@ reader::implementation::implementation(std::istream& stream,
     throw std::bad_alloc(); /* out of memory */
   }
 
+#if 1
+  raptor_world_set_log_handler(_world, nullptr, log_handler);
+#endif
+
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());
   if (_base_uri == nullptr) {
+    raptor_free_world(_world), _world = nullptr;
+    throw std::bad_alloc(); /* out of memory */
+  }
+
+  _iostream = raptor_new_iostream_from_std_istream(_world, &_stream);
+  if (_iostream == nullptr) {
+    raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
@@ -63,6 +84,7 @@ reader::implementation::implementation(std::istream& stream,
 
   _parser = raptor_new_parser(_world, parser_name.c_str());
   if (_parser == nullptr) {
+    raptor_free_iostream(_iostream), _iostream = nullptr;
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -71,6 +93,7 @@ reader::implementation::implementation(std::istream& stream,
   _statement = raptor_new_statement(_world);
   if (_statement == nullptr) {
     raptor_free_parser(_parser), _parser = nullptr;
+    raptor_free_iostream(_iostream), _iostream = nullptr;
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -84,6 +107,10 @@ reader::implementation::~implementation() {
 
   if (_parser != nullptr) {
     raptor_free_parser(_parser), _parser = nullptr;
+  }
+
+  if (_iostream != nullptr) {
+    raptor_free_iostream(_iostream), _iostream = nullptr;
   }
 
   if (_base_uri != nullptr) {
