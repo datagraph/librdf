@@ -253,7 +253,8 @@ writer::writer(std::ostream& stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(new writer::implementation(stream, content_type, charset, base_uri)) {}
+  : _implementation(new writer::implementation(
+      stream, content_type, charset, base_uri)) {}
 
 writer::~writer() = default;
 

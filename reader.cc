@@ -6,6 +6,11 @@
 
 #include "rdf++/reader.h"
 
+#include "rdf++/quad.h"
+#include "rdf++/raptor.h"
+#include "rdf++/term.h"
+#include "rdf++/triple.h"
+
 #include <cassert>   /* for assert() */
 #include <new>       /* for std::bad_alloc */
 #include <stdexcept> /* for std::invalid_argument, std::runtime_error */
@@ -17,6 +22,7 @@ using namespace rdf;
 class reader::implementation : private boost::noncopyable {
   public:
     implementation(
+      std::istream& stream,
       const std::string& content_type,
       const std::string& charset,
       const std::string& base_uri);
@@ -24,6 +30,7 @@ class reader::implementation : private boost::noncopyable {
     ~implementation();
 
   private:
+    std::istream& _stream;
     const std::string _content_type;
     const std::string _charset;
     raptor_world* _world = nullptr;
@@ -32,10 +39,12 @@ class reader::implementation : private boost::noncopyable {
     raptor_statement* _statement = nullptr;
 };
 
-reader::implementation::implementation(const std::string& content_type,
+reader::implementation::implementation(std::istream& stream,
+                                       const std::string& content_type,
                                        const std::string& charset,
                                        const std::string& base_uri)
-  : _content_type(content_type),
+  : _stream(stream),
+    _content_type(content_type),
     _charset(charset) {
 
   _world = raptor_new_world();
@@ -86,9 +95,21 @@ reader::implementation::~implementation() {
   }
 }
 
-reader::reader(const std::string& content_type,
+reader::reader(std::istream& stream,
+               const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(new reader::implementation(content_type, charset, base_uri)) {}
+  : _implementation(new reader::implementation(
+      stream, content_type, charset, base_uri)) {}
 
 reader::~reader() = default;
+
+std::unique_ptr<triple>
+reader::read_triple() {
+  return std::move(std::unique_ptr<triple>(nullptr));
+}
+
+std::unique_ptr<quad>
+reader::read_quad() {
+  return std::move(std::unique_ptr<quad>(nullptr));
+}

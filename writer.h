@@ -3,8 +3,8 @@
 #ifndef RDFXX_WRITER_H
 #define RDFXX_WRITER_H
 
-#include <ostream> /* for std::ostream */
 #include <memory>  /* for std::unique_ptr */
+#include <ostream> /* for std::ostream */
 #include <string>  /* for std::string */
 
 #include <boost/noncopyable.hpp>
