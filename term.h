@@ -37,6 +37,9 @@ namespace rdf {
     protected:
       term(const term_type type, const std::string& string)
         : type(type), string(string) {}
+
+      term(const term_type type, const char* const string)
+        : type(type), string(string) {}
   };
 
   /**
@@ -52,6 +55,9 @@ namespace rdf {
     protected:
       clonable_term(const term_type type, const std::string& string)
         : term(type, string) {}
+
+      clonable_term(const term_type type, const char* const string)
+        : term(type, string) {}
   };
 
   /**
@@ -61,6 +67,9 @@ namespace rdf {
     public:
       blank_node(const std::string& node_label)
         : clonable_term<blank_node>(term_type::blank_node, node_label) {}
+
+      blank_node(const char* const node_label)
+        : clonable_term<blank_node>(term_type::blank_node, node_label) {}
   };
 
   /**
@@ -69,6 +78,9 @@ namespace rdf {
   struct uri_reference : public clonable_term<uri_reference> {
     public:
       uri_reference(const std::string& uri_string)
+        : clonable_term<uri_reference>(term_type::uri_reference, uri_string) {}
+
+      uri_reference(const char* const uri_string)
         : clonable_term<uri_reference>(term_type::uri_reference, uri_string) {}
   };
 
@@ -80,6 +92,10 @@ namespace rdf {
       std::string language_tag;
 
       plain_literal(const std::string& lexical_form)
+        : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
+          language_tag() {}
+
+      plain_literal(const char* const lexical_form)
         : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
           language_tag() {}
 

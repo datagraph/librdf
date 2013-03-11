@@ -40,6 +40,8 @@ class writer::implementation : private boost::noncopyable {
 
     void write_quad(const quad& quad);
 
+    static void log_callback(void* user_data, raptor_log_message* message);
+
   private:
     std::ostream& _stream;
     const std::string _content_type;
@@ -55,12 +57,17 @@ class writer::implementation : private boost::noncopyable {
     void write_statement();
 };
 
-static void
-log_handler(void* const user_data,
-            raptor_log_message* const message) {
-  (void)user_data;
+/**
+ * @see http://librdf.org/raptor/api/raptor2-section-general.html#raptor-log-handler
+ */
+void
+writer::implementation::log_callback(void* const user_data,
+                                     raptor_log_message* const message) {
+  auto writer_impl = reinterpret_cast<writer::implementation*>(user_data);
+  assert(writer_impl != nullptr);
   assert(message != nullptr);
-  std::cerr << "libraptor2: " << message->text << std::endl;
+
+  fprintf(stderr, "writer::implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
 }
 
 writer::implementation::implementation(std::ostream& stream,
@@ -75,9 +82,7 @@ writer::implementation::implementation(std::ostream& stream,
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
   }
-#if 1
-  raptor_world_set_log_handler(_world, nullptr, log_handler);
-#endif
+  raptor_world_set_log_handler(_world, this, writer::implementation::log_callback);
   raptor_world_open(_world);
 
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());

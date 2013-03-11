@@ -30,6 +30,14 @@ class reader::implementation : private boost::noncopyable {
 
     ~implementation();
 
+    void begin();
+
+    void abort();
+
+    static void log_callback(void* user_data, raptor_log_message* message);
+
+    static void statement_callback(void* user_data, raptor_statement* statement);
+
   private:
     std::istream& _stream;
     const std::string _content_type;
@@ -41,12 +49,92 @@ class reader::implementation : private boost::noncopyable {
     raptor_statement* _statement = nullptr;
 };
 
-static void
-log_handler(void* const user_data,
-            raptor_log_message* const message) {
-  (void)user_data;
+/**
+ * @see http://librdf.org/raptor/api/raptor2-section-general.html#raptor-log-handler
+ */
+void
+reader::implementation::log_callback(void* const user_data,
+                                     raptor_log_message* const message) {
+  auto reader_impl = reinterpret_cast<reader::implementation*>(user_data);
+  assert(reader_impl != nullptr);
   assert(message != nullptr);
-  std::cerr << "libraptor2: " << message->text << std::endl;
+
+  fprintf(stderr, "reader::implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
+}
+
+static rdf::term*
+copy_raptor_term(const rdf::term_position pos,
+                 const raptor_term* const input) {
+  if (pos == rdf::term_position::context && input == nullptr) {
+    return nullptr; /* special case for the default context */
+  }
+
+  assert(input != nullptr);
+
+  rdf::term* term = nullptr;
+
+  switch (input->type) {
+    case RAPTOR_TERM_TYPE_BLANK: {
+      const auto node_label = reinterpret_cast<const char*>(
+        input->value.blank.string);
+      term = new rdf::blank_node(node_label);
+      break;
+    }
+
+    case RAPTOR_TERM_TYPE_URI: {
+      const auto uri_string = reinterpret_cast<const char*>(
+        raptor_uri_as_string(input->value.uri));
+      term = new rdf::uri_reference(uri_string);
+      break;
+    }
+
+    case RAPTOR_TERM_TYPE_LITERAL: {
+      const auto lexical_form = reinterpret_cast<const char*>(
+        input->value.literal.string);
+      if (input->value.literal.datatype != nullptr) {
+        const auto datatype_uri = reinterpret_cast<const char*>(
+          raptor_uri_as_string(input->value.literal.datatype));
+        term = new rdf::typed_literal(lexical_form, datatype_uri);
+      }
+      else if (input->value.literal.language != nullptr) {
+        const auto language_tag = reinterpret_cast<const char*>(
+          input->value.literal.language);
+        term = new rdf::plain_literal(lexical_form, language_tag);
+      }
+      else {
+        term = new rdf::plain_literal(lexical_form);
+      }
+      break;
+    }
+
+    case RAPTOR_TERM_TYPE_UNKNOWN:
+    default: {
+      assert(false); /* should never get here */
+      break;
+    }
+  }
+
+  assert(term != nullptr);
+  return term;
+}
+
+void
+reader::implementation::statement_callback(void* const user_data,
+                                           raptor_statement* const statement) {
+  auto reader_impl = reinterpret_cast<reader::implementation*>(user_data);
+  assert(reader_impl != nullptr);
+  assert(statement != nullptr);
+
+  fprintf(stderr, "reader::implementation::statement_callback(%p, %p)\n", user_data, statement);
+
+  rdf::term* const subject   = copy_raptor_term(rdf::term_position::subject,   statement->subject);
+  rdf::term* const predicate = copy_raptor_term(rdf::term_position::predicate, statement->predicate);
+  rdf::term* const object    = copy_raptor_term(rdf::term_position::object,    statement->object);
+  rdf::term* const context   = copy_raptor_term(rdf::term_position::context,   statement->graph);
+
+  rdf::quad* quad = new rdf::quad(subject, predicate, object, context);
+
+  (void)quad; // TODO
 }
 
 reader::implementation::implementation(std::istream& stream,
@@ -61,9 +149,7 @@ reader::implementation::implementation(std::istream& stream,
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
   }
-#if 1
-  raptor_world_set_log_handler(_world, nullptr, log_handler);
-#endif
+  raptor_world_set_log_handler(_world, this, reader::implementation::log_callback);
   raptor_world_open(_world);
 
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());
@@ -89,6 +175,7 @@ reader::implementation::implementation(std::istream& stream,
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
+  raptor_parser_set_statement_handler(_parser, this, reader::implementation::statement_callback);
 
   _statement = raptor_new_statement(_world);
   if (_statement == nullptr) {
@@ -122,6 +209,19 @@ reader::implementation::~implementation() {
   }
 }
 
+void
+reader::implementation::begin() {
+  const int rc = raptor_parser_parse_iostream(_parser, _iostream, _base_uri);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_parser_parse_iostream() failed");
+  }
+}
+
+void
+reader::implementation::abort() {
+  raptor_parser_parse_abort(_parser);
+}
+
 reader::reader(std::istream& stream,
                const std::string& content_type,
                const std::string& charset,
@@ -131,12 +231,14 @@ reader::reader(std::istream& stream,
 
 reader::~reader() = default;
 
-std::unique_ptr<triple>
-reader::read_triple() {
-  return std::move(std::unique_ptr<triple>(nullptr));
+void
+reader::begin() {
+  assert(_implementation != nullptr);
+  _implementation->begin();
 }
 
-std::unique_ptr<quad>
-reader::read_quad() {
-  return std::move(std::unique_ptr<quad>(nullptr));
+void
+reader::abort() {
+  assert(_implementation != nullptr);
+  _implementation->abort();
 }

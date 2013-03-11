@@ -23,9 +23,9 @@ namespace rdf {
 
       ~reader();
 
-      std::unique_ptr<triple> read_triple();
+      void begin();
 
-      std::unique_ptr<quad> read_quad();
+      void abort();
 
     private:
       class implementation;
