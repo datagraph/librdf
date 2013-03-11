@@ -61,10 +61,10 @@ reader::implementation::implementation(std::istream& stream,
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
   }
-
 #if 1
   raptor_world_set_log_handler(_world, nullptr, log_handler);
 #endif
+  raptor_world_open(_world);
 
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());
   if (_base_uri == nullptr) {
