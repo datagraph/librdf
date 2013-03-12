@@ -10,6 +10,10 @@
 #include <cstddef> /* for std::size_t */
 #include <ostream> /* for std::ostream */
 
+#if 0
+#include <cstdio>  /* for debugging */
+#endif
+
 #include <raptor2/raptor2.h> /* for raptor_*() */
 
 /**
@@ -18,6 +22,9 @@
 static int
 std_iostream_write_byte(void* const user_data,
                         const int byte) {
+#if 0
+  fprintf(stderr, "std_iostream_write_byte(stream=%p, byte=%d)\n", user_data, byte);
+#endif
   std::ostream* const stream = reinterpret_cast<std::ostream*>(user_data);
   assert(stream != nullptr);
   try {
@@ -37,6 +44,10 @@ std_iostream_write_bytes(void* const restrict user_data,
                          const void* const restrict data,
                          const std::size_t size,
                          const std::size_t nmemb) {
+#if 0
+  fprintf(stderr, "std_iostream_write_bytes(stream=%p, data=%p, size=%zu, nmemb=%zu)\n",
+    user_data, data, size, nmemb);
+#endif
   std::ostream* const stream = reinterpret_cast<std::ostream*>(user_data);
   assert(stream != nullptr);
   assert(data != nullptr);
@@ -55,17 +66,27 @@ std_iostream_write_bytes(void* const restrict user_data,
  */
 static int
 std_iostream_read_bytes(void* const restrict user_data,
-                        void* const restrict data,
-                        const size_t size,
-                        const size_t nmemb) {
+                        void* const restrict data_,
+                        const std::size_t size,
+                        const std::size_t nmemb) {
+
+#if 0
+  fprintf(stderr, "std_iostream_read_bytes(stream=%p, data=%p, size=%zu, nmemb=%zu)\n",
+    user_data, data_, size, nmemb);
+#endif
   std::istream* const stream = reinterpret_cast<std::istream*>(user_data);
   assert(stream != nullptr);
+  char* data = reinterpret_cast<char*>(data_);
   assert(data != nullptr);
   try {
     if (stream->eof()) return 0;
-    const std::size_t byte_count = nmemb * size;
-    stream->read(reinterpret_cast<char*>(data), byte_count); // FIXME: partial reads?
-    return static_cast<int>(byte_count); /* success */
+    std::size_t count = 0;
+    while (count < nmemb) {
+      stream->read(data + (count * size), size);
+      if (stream->fail()) break;
+      count++;
+    }
+    return static_cast<int>(count);
   }
   catch (const std::ios_base::failure& error) {
     return -1; /* failure */
@@ -77,6 +98,9 @@ std_iostream_read_bytes(void* const restrict user_data,
  */
 static int
 std_iostream_read_eof(void* const user_data) {
+#if 0
+  fprintf(stderr, "std_iostream_read_eof(stream=%p)\n", user_data);
+#endif
   std::istream* const stream = reinterpret_cast<std::istream*>(user_data);
   assert(stream != nullptr);
   try {

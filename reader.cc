@@ -65,7 +65,8 @@ reader::implementation::log_callback(void* const user_data,
   assert(reader_impl != nullptr);
   assert(message != nullptr);
 
-  fprintf(stderr, "reader::implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
+  fprintf(stderr, "reader::implementation::log_callback(%p, %p): message=%s locator=%d:%d\n",
+    user_data, message, message->text, message->locator->line, message->locator->column);
 }
 
 static rdf::term*
