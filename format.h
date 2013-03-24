@@ -4,6 +4,9 @@
 #define RDFXX_FORMAT_H
 
 namespace rdf {
+  namespace format {
+    const char* find_writer_name_for(const char* content_type);
+  }
 }
 
 #endif /* RDFXX_FORMAT_H */

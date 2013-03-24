@@ -6,6 +6,7 @@
 
 #include "rdf++/writer.h"
 
+#include "rdf++/format.h"
 #include "rdf++/quad.h"
 #include "rdf++/raptor.h"
 #include "rdf++/term.h"
@@ -125,6 +126,11 @@ writer::implementation::implementation(FILE* const stream,
 void
 writer::implementation::initialize(const std::string& base_uri,
                                    std::function<raptor_iostream* ()> make_raptor_iostream) {
+  const char* const serializer_name = format::find_writer_name_for(_content_type.c_str());
+  if (serializer_name == nullptr) {
+    throw std::invalid_argument("unknown content type: " + _content_type);
+  }
+
   _world = raptor_new_world();
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
@@ -145,19 +151,7 @@ writer::implementation::initialize(const std::string& base_uri,
     throw std::bad_alloc(); /* out of memory */
   }
 
-  std::string serializer_name("nquads"); // TODO
-/*
-  for (unsigned int i = 0; i < rdf_format_count; i++) {
-    const rdf_format_t* const format_info = &rdf_format_info[i];
-    if (str_equal(content_type, format_info->content_type)) {
-      serializer_name = format_info->serializer_name;
-      break;
-    }
-  }
-*/
-  assert(!serializer_name.empty()); /* already validated by rdf_format_supported() */
-
-  _serializer = raptor_new_serializer(_world, serializer_name.c_str());
+  _serializer = raptor_new_serializer(_world, serializer_name);
   if (_serializer == nullptr) {
     raptor_free_iostream(_iostream), _iostream = nullptr;
     raptor_free_uri(_base_uri), _base_uri = nullptr;
