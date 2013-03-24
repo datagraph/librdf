@@ -16,7 +16,7 @@ raptor_iostream* raptor_new_iostream_from_std_istream(
   raptor_world* world,
   std::istream* stream);
 
-raptor_iostream* raptor_new_iostream_from_std_ostream(
+raptor_iostream* raptor_new_iostream_to_std_ostream(
   raptor_world* world,
   std::ostream* stream);
 

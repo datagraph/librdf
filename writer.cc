@@ -11,10 +11,11 @@
 #include "rdf++/term.h"
 #include "rdf++/triple.h"
 
-#include <cassert>   /* for assert() */
-#include <iostream>  /* for std::cerr, std::endl */
-#include <new>       /* for std::bad_alloc */
-#include <stdexcept> /* for std::invalid_argument, std::runtime_error */
+#include <cassert>    /* for assert() */
+#include <functional> /* for std::function */
+#include <iostream>   /* for std::cerr, std::endl */
+#include <new>        /* for std::bad_alloc */
+#include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 
 #include <raptor2/raptor2.h> /* for raptor_*() */
 
@@ -23,7 +24,19 @@ using namespace rdf;
 class writer::implementation : private boost::noncopyable {
   public:
     implementation(
+      const std::string& file_path,
+      const std::string& content_type,
+      const std::string& charset,
+      const std::string& base_uri);
+
+    implementation(
       std::ostream& stream,
+      const std::string& content_type,
+      const std::string& charset,
+      const std::string& base_uri);
+
+    implementation(
+      FILE* stream,
       const std::string& content_type,
       const std::string& charset,
       const std::string& base_uri);
@@ -43,7 +56,6 @@ class writer::implementation : private boost::noncopyable {
     static void log_callback(void* user_data, raptor_log_message* message);
 
   private:
-    std::ostream& _stream;
     const std::string _content_type;
     const std::string _charset;
     raptor_world* _world = nullptr;
@@ -51,6 +63,8 @@ class writer::implementation : private boost::noncopyable {
     raptor_iostream* _iostream = nullptr;
     raptor_serializer* _serializer = nullptr;
     raptor_statement* _statement = nullptr;
+
+    void initialize(const std::string& base_uri, std::function<raptor_iostream* ()> make_raptor_iostream);
 
     raptor_term* make_raptor_term(const rdf::term_position pos, const rdf::term& term);
 
@@ -70,14 +84,47 @@ writer::implementation::log_callback(void* const user_data,
   fprintf(stderr, "writer::implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
 }
 
+writer::implementation::implementation(const std::string& file_path,
+                                       const std::string& content_type,
+                                       const std::string& charset,
+                                       const std::string& base_uri)
+  : _content_type(content_type),
+    _charset(charset) {
+  assert(!file_path.empty());
+
+  initialize(base_uri, [this, &file_path]() -> raptor_iostream* {
+    return raptor_new_iostream_to_filename(_world, file_path.c_str());
+  });
+}
+
 writer::implementation::implementation(std::ostream& stream,
                                        const std::string& content_type,
                                        const std::string& charset,
                                        const std::string& base_uri)
-  : _stream(stream),
-    _content_type(content_type),
+  : _content_type(content_type),
     _charset(charset) {
 
+  initialize(base_uri, [this, &stream]() -> raptor_iostream* {
+    return raptor_new_iostream_to_std_ostream(_world, &stream);
+  });
+}
+
+writer::implementation::implementation(FILE* const stream,
+                                       const std::string& content_type,
+                                       const std::string& charset,
+                                       const std::string& base_uri)
+  : _content_type(content_type),
+    _charset(charset) {
+  assert(stream != nullptr);
+
+  initialize(base_uri, [this, &stream]() -> raptor_iostream* {
+    return raptor_new_iostream_to_file_handle(_world, stream);
+  });
+}
+
+void
+writer::implementation::initialize(const std::string& base_uri,
+                                   std::function<raptor_iostream* ()> make_raptor_iostream) {
   _world = raptor_new_world();
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
@@ -91,7 +138,7 @@ writer::implementation::implementation(std::ostream& stream,
     throw std::bad_alloc(); /* out of memory */
   }
 
-  _iostream = raptor_new_iostream_from_std_ostream(_world, &_stream);
+  _iostream = make_raptor_iostream();
   if (_iostream == nullptr) {
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
@@ -254,7 +301,21 @@ writer::implementation::write_quad(const quad& quad) {
   raptor_statement_clear(_statement);
 }
 
+writer::writer(const std::string& file_path,
+               const std::string& content_type,
+               const std::string& charset,
+               const std::string& base_uri)
+  : _implementation(new writer::implementation(
+      file_path, content_type, charset, base_uri)) {}
+
 writer::writer(std::ostream& stream,
+               const std::string& content_type,
+               const std::string& charset,
+               const std::string& base_uri)
+  : _implementation(new writer::implementation(
+      stream, content_type, charset, base_uri)) {}
+
+writer::writer(FILE* const stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)

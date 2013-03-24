@@ -3,6 +3,7 @@
 #ifndef RDFXX_WRITER_H
 #define RDFXX_WRITER_H
 
+#include <cstdio>  /* for FILE */
 #include <memory>  /* for std::unique_ptr */
 #include <ostream> /* for std::ostream */
 #include <string>  /* for std::string */
@@ -16,7 +17,19 @@ namespace rdf {
   class writer : private boost::noncopyable {
     public:
       writer(
+        const std::string& file_path,
+        const std::string& content_type,
+        const std::string& charset,
+        const std::string& base_uri);
+
+      writer(
         std::ostream& stream,
+        const std::string& content_type,
+        const std::string& charset,
+        const std::string& base_uri);
+
+      writer(
+        FILE* stream,
         const std::string& content_type,
         const std::string& charset,
         const std::string& base_uri);

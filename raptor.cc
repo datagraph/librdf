@@ -132,7 +132,7 @@ raptor_new_iostream_from_std_istream(raptor_world* world,
 }
 
 raptor_iostream*
-raptor_new_iostream_from_std_ostream(raptor_world* world,
-                                     std::ostream* stream) {
+raptor_new_iostream_to_std_ostream(raptor_world* world,
+                                   std::ostream* stream) {
   return raptor_new_iostream_from_handler(world, stream, &std_iostream_handler);
 }
