@@ -108,7 +108,7 @@ namespace rdf {
       plain_literal(const char* const lexical_form,
                     const char* const language_tag = nullptr)
         : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
-          language_tag(language_tag) {
+          language_tag(language_tag != nullptr ? language_tag : "") {
         if (language_tag != nullptr) {
           // TODO: normalize the language tag to lower case, if needed.
         }
