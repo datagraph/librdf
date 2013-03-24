@@ -3,7 +3,8 @@
 #ifndef RDFXX_TERM_H
 #define RDFXX_TERM_H
 
-#include <string> /* for std::string */
+#include <cassert> /* for assert() */
+#include <string>  /* for std::string */
 
 namespace rdf {
   enum class term_type : int {
@@ -95,15 +96,22 @@ namespace rdf {
         : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
           language_tag() {}
 
-      plain_literal(const char* const lexical_form)
-        : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
-          language_tag() {}
-
       plain_literal(const std::string& lexical_form,
                     const std::string& language_tag)
         : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
           language_tag(language_tag) {
-        // TODO: normalize the language tag to lower case, if needed.
+        if (!language_tag.empty()) {
+          // TODO: normalize the language tag to lower case, if needed.
+        }
+      }
+
+      plain_literal(const char* const lexical_form,
+                    const char* const language_tag = nullptr)
+        : clonable_term<plain_literal>(term_type::plain_literal, lexical_form),
+          language_tag(language_tag) {
+        if (language_tag != nullptr) {
+          // TODO: normalize the language tag to lower case, if needed.
+        }
       }
   };
 
@@ -117,7 +125,16 @@ namespace rdf {
       typed_literal(const std::string& lexical_form,
                     const std::string& datatype_uri)
         : clonable_term<typed_literal>(term_type::typed_literal, lexical_form),
-          datatype_uri(datatype_uri) {}
+          datatype_uri(datatype_uri) {
+        assert(!datatype_uri.empty());
+      }
+
+      typed_literal(const char* const lexical_form,
+                    const char* const datatype_uri)
+        : clonable_term<typed_literal>(term_type::typed_literal, lexical_form),
+          datatype_uri(datatype_uri) {
+        assert(datatype_uri != nullptr);
+      }
   };
 
   extern const term* const default_context;
