@@ -3,8 +3,9 @@
 #ifndef RDFXX_TERM_H
 #define RDFXX_TERM_H
 
-#include <cassert> /* for assert() */
-#include <string>  /* for std::string */
+#include <cassert>   /* for assert() */
+#include <stdexcept> /* for std::invalid_argument */
+#include <string>    /* for std::string */
 
 namespace rdf {
   enum class term_type : int {
@@ -142,14 +143,18 @@ namespace rdf {
                     const std::string& datatype_uri)
         : clonable_term<typed_literal>(term_type::typed_literal, lexical_form),
           datatype_uri(datatype_uri) {
-        assert(!datatype_uri.empty());
+        if (datatype_uri.empty()) {
+          throw std::invalid_argument("datatype URI cannot be empty");
+        }
       }
 
       typed_literal(const char* const lexical_form,
                     const char* const datatype_uri)
         : clonable_term<typed_literal>(term_type::typed_literal, lexical_form),
           datatype_uri(datatype_uri) {
-        assert(datatype_uri != nullptr);
+        if (datatype_uri == nullptr) {
+          throw std::invalid_argument("datatype URI cannot be nullptr");
+        }
       }
   };
 
