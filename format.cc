@@ -37,7 +37,11 @@ static const rdf_format_t rdf_format_info[] = {
   {"text/rdf+n3",           nullptr, nullptr, "turtle", "turtle"},
   {"application/rdf+n3",    nullptr, nullptr, "turtle", "turtle"},
   /* RDF/XML (.rdf) */
+#if 1
+  {"application/rdf+xml",   nullptr, "rdf",   "rdfxml", "rdfxml",},
+#else
   {"application/rdf+xml",   nullptr, "rdf",   "rdfxml", "rdfxml-abbrev",},
+#endif
   /* RDF/JSON (.json) */
   {"application/json",      nullptr, "json",  "json", "json"},
   {"text/json",             nullptr, nullptr, "json", "json"},              /* unofficial, deprecated */
