@@ -35,6 +35,22 @@ namespace rdf {
 
       virtual term* clone() const = 0;
 
+      inline bool is_uri_reference() const {
+        return type == term_type::uri_reference;
+      }
+
+      inline bool is_blank_node() const {
+        return type == term_type::blank_node;
+      }
+
+      inline bool is_plain_literal() const {
+        return type == term_type::plain_literal;
+      }
+
+      inline bool is_typed_literal() const {
+        return type == term_type::typed_literal;
+      }
+
     protected:
       term(const term_type type, const std::string& string)
         : type(type), string(string) {}
@@ -62,18 +78,6 @@ namespace rdf {
   };
 
   /**
-   * @see http://www.w3.org/TR/rdf-concepts/#section-blank-nodes
-   */
-  struct blank_node : public clonable_term<blank_node> {
-    public:
-      blank_node(const std::string& node_label)
-        : clonable_term<blank_node>(term_type::blank_node, node_label) {}
-
-      blank_node(const char* const node_label)
-        : clonable_term<blank_node>(term_type::blank_node, node_label) {}
-  };
-
-  /**
    * @see http://www.w3.org/TR/rdf-concepts/#section-Graph-URIref
    */
   struct uri_reference : public clonable_term<uri_reference> {
@@ -83,6 +87,18 @@ namespace rdf {
 
       uri_reference(const char* const uri_string)
         : clonable_term<uri_reference>(term_type::uri_reference, uri_string) {}
+  };
+
+  /**
+   * @see http://www.w3.org/TR/rdf-concepts/#section-blank-nodes
+   */
+  struct blank_node : public clonable_term<blank_node> {
+    public:
+      blank_node(const std::string& node_label)
+        : clonable_term<blank_node>(term_type::blank_node, node_label) {}
+
+      blank_node(const char* const node_label)
+        : clonable_term<blank_node>(term_type::blank_node, node_label) {}
   };
 
   /**
