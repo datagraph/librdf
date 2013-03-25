@@ -60,8 +60,22 @@ static const rdf_format_t rdf_format_info[] = {
 static const unsigned int rdf_format_count =
   (sizeof(rdf_format_info) / sizeof(rdf_format_info[0])) - 1;
 
+bool
+format::supported(const char* const content_type) {
+  if (content_type != nullptr) {
+    for (unsigned int i = 0; i < rdf_format_count; i++) {
+      const rdf_format_t* const format_info = &rdf_format_info[i];
+      if (std::strcmp(content_type, format_info->content_type) == 0) {
+        return true; /* found */
+      }
+    }
+  }
+
+  return false; /* not found */
+}
+
 const char*
-format::find_writer_name_for(const char* content_type) {
+format::find_writer_name_for(const char* const content_type) {
   assert(content_type != nullptr);
 
   for (unsigned int i = 0; i < rdf_format_count; i++) {
