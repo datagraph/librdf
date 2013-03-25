@@ -7,11 +7,11 @@
 
 namespace rdf {
   namespace format {
+    bool supported(const char* content_type);
+
     inline bool supported(const std::string& content_type) {
       return supported(content_type.c_str());
     }
-
-    bool supported(const char* content_type);
 
     const char* find_writer_name_for(const char* content_type);
   }
