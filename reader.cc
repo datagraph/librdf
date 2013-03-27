@@ -11,10 +11,11 @@
 #include "rdf++/term.h"
 #include "rdf++/triple.h"
 
-#include <cassert>   /* for assert() */
-#include <iostream>  /* for std::cerr, std::endl */
-#include <new>       /* for std::bad_alloc */
-#include <stdexcept> /* for std::invalid_argument, std::runtime_error */
+#include <cassert>    /* for assert() */
+#include <functional> /* for std::function */
+#include <iostream>   /* for std::cerr, std::endl */
+#include <new>        /* for std::bad_alloc */
+#include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 
 #include <raptor2/raptor2.h> /* for raptor_*() */
 
@@ -23,7 +24,19 @@ using namespace rdf;
 class reader::implementation : private boost::noncopyable {
   public:
     implementation(
+      const std::string& file_path,
+      const std::string& content_type,
+      const std::string& charset,
+      const std::string& base_uri);
+
+    implementation(
       std::istream& stream,
+      const std::string& content_type,
+      const std::string& charset,
+      const std::string& base_uri);
+
+    implementation(
+      FILE* stream,
       const std::string& content_type,
       const std::string& charset,
       const std::string& base_uri);
@@ -43,7 +56,6 @@ class reader::implementation : private boost::noncopyable {
     static void statement_callback(void* user_data, raptor_statement* statement);
 
   private:
-    std::istream& _stream;
     const std::string _content_type;
     const std::string _charset;
     raptor_world* _world = nullptr;
@@ -53,6 +65,8 @@ class reader::implementation : private boost::noncopyable {
     raptor_statement* _statement = nullptr;
     std::function<void (rdf::triple*)> _triple_callback;
     std::function<void (rdf::quad*)> _quad_callback;
+
+    void initialize(const std::string& base_uri, std::function<raptor_iostream* ()> make_raptor_iostream);
 };
 
 /**
@@ -153,14 +167,47 @@ reader::implementation::statement_callback(void* const user_data,
   }
 }
 
+reader::implementation::implementation(const std::string& file_path,
+                                       const std::string& content_type,
+                                       const std::string& charset,
+                                       const std::string& base_uri)
+  : _content_type(content_type),
+    _charset(charset) {
+  assert(!file_path.empty());
+
+  initialize(base_uri, [this, &file_path]() -> raptor_iostream* {
+    return raptor_new_iostream_from_filename(_world, file_path.c_str());
+  });
+}
+
 reader::implementation::implementation(std::istream& stream,
                                        const std::string& content_type,
                                        const std::string& charset,
                                        const std::string& base_uri)
-  : _stream(stream),
-    _content_type(content_type),
+  : _content_type(content_type),
     _charset(charset) {
 
+  initialize(base_uri, [this, &stream]() -> raptor_iostream* {
+    return raptor_new_iostream_from_std_istream(_world, &stream);
+  });
+}
+
+reader::implementation::implementation(FILE* const stream,
+                                       const std::string& content_type,
+                                       const std::string& charset,
+                                       const std::string& base_uri)
+  : _content_type(content_type),
+    _charset(charset) {
+  assert(stream != nullptr);
+
+  initialize(base_uri, [this, &stream]() -> raptor_iostream* {
+    return raptor_new_iostream_from_file_handle(_world, stream);
+  });
+}
+
+void
+reader::implementation::initialize(const std::string& base_uri,
+                                   std::function<raptor_iostream* ()> make_raptor_iostream) {
   _world = raptor_new_world();
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
@@ -174,14 +221,14 @@ reader::implementation::implementation(std::istream& stream,
     throw std::bad_alloc(); /* out of memory */
   }
 
-  _iostream = raptor_new_iostream_from_std_istream(_world, &_stream);
+  _iostream = make_raptor_iostream();
   if (_iostream == nullptr) {
     raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
 
-  std::string parser_name("nquads"); // TODO
+  std::string parser_name("nquads"); // FIXME
   assert(!parser_name.empty());
 
   _parser = raptor_new_parser(_world, parser_name.c_str());
@@ -252,7 +299,21 @@ reader::implementation::abort() {
   raptor_parser_parse_abort(_parser);
 }
 
+reader::reader(const std::string& file_path,
+               const std::string& content_type,
+               const std::string& charset,
+               const std::string& base_uri)
+  : _implementation(new reader::implementation(
+      file_path, content_type, charset, base_uri)) {}
+
 reader::reader(std::istream& stream,
+               const std::string& content_type,
+               const std::string& charset,
+               const std::string& base_uri)
+  : _implementation(new reader::implementation(
+      stream, content_type, charset, base_uri)) {}
+
+reader::reader(FILE* const stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)

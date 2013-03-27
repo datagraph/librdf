@@ -3,6 +3,7 @@
 #ifndef RDFXX_READER_H
 #define RDFXX_READER_H
 
+#include <cstdio>     /* for FILE */
 #include <functional> /* for std::function */
 #include <istream>    /* for std::istream */
 #include <memory>     /* for std::unique_ptr */
@@ -17,7 +18,19 @@ namespace rdf {
   class reader : private boost::noncopyable {
     public:
       reader(
+        const std::string& file_path,
+        const std::string& content_type,
+        const std::string& charset,
+        const std::string& base_uri);
+
+      reader(
         std::istream& stream,
+        const std::string& content_type,
+        const std::string& charset,
+        const std::string& base_uri);
+
+      reader(
+        FILE* stream,
         const std::string& content_type,
         const std::string& charset,
         const std::string& base_uri);
