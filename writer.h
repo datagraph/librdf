@@ -53,6 +53,10 @@ namespace rdf {
     private:
       class implementation;
 
+      class jsonld;
+      class raptor;
+      class trix;
+
       std::unique_ptr<implementation> _implementation;
   };
 }

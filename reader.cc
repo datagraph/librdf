@@ -5,6 +5,10 @@
 #endif
 
 #include "rdf++/reader.h"
+#include "rdf++/reader/impl.h"
+#include "rdf++/reader/jsonld.h"
+#include "rdf++/reader/raptor.h"
+#include "rdf++/reader/trix.h"
 
 #include "rdf++/quad.h"
 #include "rdf++/raptor.h"

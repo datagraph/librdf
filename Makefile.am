@@ -12,10 +12,16 @@ librdf___la_SOURCES =     \
   quad.cc                 \
   raptor.cc               \
   reader.cc               \
+  reader/jsonld.cc        \
+  reader/raptor.cc        \
+  reader/trix.cc          \
   term.cc                 \
   triple.cc               \
   version.cc              \
-  writer.cc
+  writer.cc               \
+  writer/jsonld.cc        \
+  writer/raptor.cc        \
+  writer/trix.cc
 
 base_pkgincludedir = $(includedir)/rdf++
 
