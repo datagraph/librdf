@@ -19,6 +19,7 @@ librdf___la_SOURCES =     \
   triple.cc               \
   version.cc              \
   writer.cc               \
+  writer/impl.cc          \
   writer/jsonld.cc        \
   writer/raptor.cc        \
   writer/trix.cc

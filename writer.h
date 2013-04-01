@@ -3,6 +3,10 @@
 #ifndef RDFXX_WRITER_H
 #define RDFXX_WRITER_H
 
+#include "rdf++/term.h"
+#include "rdf++/triple.h"
+#include "rdf++/quad.h"
+
 #include <cstdio>  /* for FILE */
 #include <memory>  /* for std::unique_ptr */
 #include <ostream> /* for std::ostream */
@@ -50,8 +54,9 @@ namespace rdf {
 
       void write_quad(const quad& quad);
 
-    private:
       class implementation;
+
+    private:
 
       class jsonld;
       class raptor;

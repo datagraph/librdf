@@ -6,9 +6,6 @@
 
 #include "rdf++/writer.h"
 #include "rdf++/writer/impl.h"
-#include "rdf++/writer/jsonld.h"
-#include "rdf++/writer/raptor.h"
-#include "rdf++/writer/trix.h"
 
 #include "rdf++/format.h"
 #include "rdf++/quad.h"
@@ -25,22 +22,22 @@ writer::writer(const std::string& file_path,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(nullptr/*new writer::implementation(
-      file_path, content_type, charset, base_uri)*/) {}
+  : _implementation(writer::implementation::create(
+      file_path, content_type, charset, base_uri)) {}
 
 writer::writer(std::ostream& stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(nullptr/*new writer::implementation(
-      stream, content_type, charset, base_uri)*/) {}
+  : _implementation(writer::implementation::create(
+      stream, content_type, charset, base_uri)) {}
 
 writer::writer(FILE* const stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(nullptr/*new writer::implementation(
-      stream, content_type, charset, base_uri)*/) {}
+  : _implementation(writer::implementation::create(
+      stream, content_type, charset, base_uri)) {}
 
 writer::~writer() = default;
 
