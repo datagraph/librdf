@@ -70,6 +70,11 @@ dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
 AX_BOOST_BASE([1.48])
 AX_BOOST_UNIT_TEST_FRAMEWORK
+# libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
+AC_CHECK_HEADERS([raptor2/raptor2.h],
+  AC_SEARCH_LIBS([raptor_new_world_internal], [raptor2], [],
+    AC_MSG_ERROR([*** Shared library libraptor2 not found; install https://github.com/datagraph/raptor ***])),
+  AC_MSG_ERROR([*** Header file <raptor2.h> not found; install https://github.com/datagraph/raptor ***]))
 
 dnl Check for header files:
 
