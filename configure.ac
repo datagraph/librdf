@@ -42,7 +42,7 @@ AC_USE_SYSTEM_EXTENSIONS
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 LT_INIT
 AC_LANG([C++])
-dnl AX_CXX_COMPILE_STDCXX_11([noext])
+AX_CXX_COMPILE_STDCXX_11([noext])
 
 dnl Check for configuration options:
 # --with-stdlib=libstdc++|libc++
