@@ -1,7 +1,3 @@
-AM_CPPFLAGS     = -I$(top_srcdir)/lib -I$(top_srcdir)/src -iquote $(srcdir) $(BOOST_CPPFLAGS)
-AM_CXXFLAGS     = -Wall -Wextra -pipe
-AM_LDFLAGS      = $(BOOST_LDFLAGS)
-LDADD           = librdf++.la
 lib_LTLIBRARIES = librdf++.la
 
 librdf___la_SOURCES =     \
