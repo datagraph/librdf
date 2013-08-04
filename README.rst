@@ -23,13 +23,13 @@ Build Prerequisites
 Build Dependencies
 ------------------
 
-* Boost.Utility_ (>= 1.48)
-* Boost.Test_ (>= 1.48)
 * libraptor2_ (>= 2.0.8)
+* Boost.Utility_ (>= 1.48)
+* Boost.Test_ (>= 1.48) for ``make check`` unit tests only
 
+.. _libraptor2:    http://librdf.org/raptor/
 .. _Boost.Utility: http://www.boost.org/libs/utility/
 .. _Boost.Test:    http://www.boost.org/libs/test/
-.. _libraptor2:    http://librdf.org/raptor/
 
 Installation on Unix
 --------------------
