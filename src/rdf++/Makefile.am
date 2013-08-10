@@ -16,9 +16,7 @@ librdf___la_SOURCES =     \
   version.cc              \
   writer.cc               \
   writer/impl.cc          \
-  writer/jsonld.cc        \
-  writer/raptor.cc        \
-  writer/trix.cc
+  writer/raptor.cc
 
 base_pkgincludedir = $(includedir)/rdf++
 
@@ -33,3 +31,11 @@ base_pkginclude_HEADERS = \
   triple.h                \
   version.h               \
   writer.h
+
+if !DISABLE_JSONLD
+  librdf___la_SOURCES += writer/jsonld.cc
+endif
+
+if !DISABLE_TRIX
+  librdf___la_SOURCES += writer/trix.cc
+endif
