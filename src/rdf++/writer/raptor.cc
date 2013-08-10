@@ -75,7 +75,7 @@ writer::raptor::raptor(FILE* const stream,
 
 void
 writer::raptor::initialize(const std::string& base_uri,
-                                   std::function<raptor_iostream* ()> make_raptor_iostream) {
+                           std::function<raptor_iostream* ()> make_raptor_iostream) {
   const char* const serializer_name = format::find_writer_name_for(_content_type.c_str());
   if (serializer_name == nullptr) {
     throw std::invalid_argument("unknown content type: " + _content_type);
@@ -167,7 +167,7 @@ writer::raptor::flush() {
 
 raptor_term*
 writer::raptor::make_raptor_term(const rdf::term_position pos,
-                                         const rdf::term& term) {
+                                 const rdf::term& term) {
   switch (term.type) {
     case rdf::term_type::none: { /* the default context only */
       assert(pos == rdf::term_position::context);
