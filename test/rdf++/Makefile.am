@@ -15,6 +15,30 @@ check_PROGRAMS = \
   check_version  \
   check_writer
 
+if !DISABLE_JSONLD
+  check_PROGRAMS += check_writer_jsonld
+endif
+
+if !DISABLE_NQUADS
+  check_PROGRAMS += check_writer_nquads
+endif
+
+if !DISABLE_RDFXML
+  check_PROGRAMS += check_writer_rdfxml
+endif
+
+if !DISABLE_TRIG
+  check_PROGRAMS += check_writer_trig
+endif
+
+if !DISABLE_TRIX
+  check_PROGRAMS += check_writer_trix
+endif
+
+if !DISABLE_TURTLE
+  check_PROGRAMS += check_writer_turtle
+endif
+
 TESTS = $(check_PROGRAMS)
 
 AM_DEFAULT_SOURCE_EXT = .cc

@@ -1,6 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-#define BOOST_TEST_MODULE writer
+#define BOOST_TEST_MODULE writer_trig
 #include <boost/test/unit_test.hpp>
 
 #include <rdf++/writer.h> /* for rdf::writer */
@@ -12,10 +12,5 @@
 #include <sstream>        /* for std::ostringstream */
 
 BOOST_AUTO_TEST_CASE(test_ctor) {
-  rdf::writer writer(std::cout, "text/x-nquads", "UTF-8", "http://example.org/");
-  BOOST_CHECK(true); // TODO
-}
-
-BOOST_AUTO_TEST_CASE(test_define_prefix) {
   BOOST_CHECK(true); // TODO
 }
