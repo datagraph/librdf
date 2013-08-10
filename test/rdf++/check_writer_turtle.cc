@@ -12,5 +12,6 @@
 #include <sstream>        /* for std::ostringstream */
 
 BOOST_AUTO_TEST_CASE(test_ctor) {
+  rdf::writer writer(std::cout, "text/turtle", "UTF-8", "http://example.org/");
   BOOST_CHECK(true); // TODO
 }
