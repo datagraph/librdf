@@ -6,45 +6,31 @@
 
 #include "rdf++/writer/trix.h"
 
+#include <cassert> /* for assert() */
+
 using namespace rdf;
 
-class writer::trix : public writer::implementation {
-  public:
-    trix();
+writer::trix::trix(const std::string& file_path,
+                   const std::string& content_type,
+                   const std::string& charset,
+                   const std::string& base_uri) {
+  assert(!file_path.empty());
+  (void)file_path, (void)content_type, (void)charset, (void)base_uri;
+}
 
-    trix(
-      const std::string& file_path,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
+writer::trix::trix(std::ostream& stream,
+                   const std::string& content_type,
+                   const std::string& charset,
+                   const std::string& base_uri) {
+  (void)stream, (void)content_type, (void)charset, (void)base_uri;
+}
 
-    trix(
-      std::ostream& stream,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
-
-    trix(
-      FILE* stream,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
-
-    virtual ~trix() override;
-
-    virtual void begin() override;
-
-    virtual void finish() override;
-
-    virtual void flush() override;
-
-    virtual void write_triple(const triple& triple) override;
-
-    virtual void write_quad(const quad& quad) override;
-};
-
-writer::trix::trix() {
-  // TODO
+writer::trix::trix(FILE* const stream,
+                   const std::string& content_type,
+                   const std::string& charset,
+                   const std::string& base_uri) {
+  assert(stream != nullptr);
+  (void)stream, (void)content_type, (void)charset, (void)base_uri;
 }
 
 writer::trix::~trix() {
