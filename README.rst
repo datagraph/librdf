@@ -13,23 +13,25 @@ Build Prerequisites
 * Autoconf_ (>= 2.68)
 * Automake_ (>= 1.11)
 * Libtool_ (>= 2.2)
+* pkg-config (>= 0.24)
 
-.. _Clang:    http://clang.llvm.org/
-.. _GCC:      http://gcc.gnu.org/
-.. _Autoconf: http://www.gnu.org/software/autoconf/
-.. _Automake: http://www.gnu.org/software/automake/
-.. _Libtool:  http://www.gnu.org/software/libtool/
+.. _Clang:      http://clang.llvm.org/
+.. _GCC:        http://gcc.gnu.org/
+.. _Autoconf:   http://www.gnu.org/software/autoconf/
+.. _Automake:   http://www.gnu.org/software/automake/
+.. _Libtool:    http://www.gnu.org/software/libtool/
+.. _pkg-config: http://pkg-config.freedesktop.org/
 
 Build Dependencies
 ------------------
 
-* libxml2_ (>= 2.7.8), for the TriX format only
 * libraptor2_ (>= 2.0.8)
+* libxml2_ (>= 2.7.8), for the TriX format only
 * Boost.Utility_ (>= 1.48)
 * Boost.Test_ (>= 1.48), for ``make check`` unit tests only
 
-.. _libxml2:       http://www.xmlsoft.org/
 .. _libraptor2:    http://librdf.org/raptor/
+.. _libxml2:       http://www.xmlsoft.org/
 .. _Boost.Utility: http://www.boost.org/libs/utility/
 .. _Boost.Test:    http://www.boost.org/libs/test/
 

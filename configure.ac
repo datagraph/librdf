@@ -41,6 +41,7 @@ AC_PROG_CXXCPP
 AC_USE_SYSTEM_EXTENSIONS
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 LT_INIT
+PKG_PROG_PKG_CONFIG([0.24])
 AC_LANG([C++])
 AX_CXX_COMPILE_STDCXX_11([noext])
 
@@ -84,18 +85,12 @@ AX_ARG_ENABLE_FORMAT([turtle], [Turtle])  # --enable-turtle/--disable-turtle
 dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
 AX_BOOST_BASE([1.48], [AX_BOOST_UNIT_TEST_FRAMEWORK])
+# libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
+PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.8])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_trix" != "xno"], [
-  AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],
-    AC_SEARCH_LIBS([xmlTextWriterStartDocument], [xml2], [],
-      AC_MSG_ERROR([*** Shared library libxml2 not found; install http://xmlsoft.org/ ***])),
-    AC_MSG_ERROR([*** Header file <libxml/xmlwriter.h> not found; install http://xmlsoft.org/ ***]))
+  PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])
 ])
-# libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
-AC_CHECK_HEADERS([raptor2/raptor2.h],
-  AC_SEARCH_LIBS([raptor_new_world_internal], [raptor2], [],
-    AC_MSG_ERROR([*** Shared library libraptor2 not found; install https://github.com/datagraph/raptor ***])),
-  AC_MSG_ERROR([*** Header file <raptor2.h> not found; install https://github.com/datagraph/raptor ***]))
 
 dnl Check for header files:
 

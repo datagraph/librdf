@@ -1,4 +1,8 @@
+AM_CPPFLAGS += $(libraptor2_CFLAGS)
+
 lib_LTLIBRARIES = librdf++.la
+
+librdf___la_LIBADD = $(libraptor2_LIBS)
 
 librdf___la_SOURCES =     \
   extern.cc               \
@@ -37,5 +41,7 @@ if !DISABLE_JSONLD
 endif
 
 if !DISABLE_TRIX
+  AM_CPPFLAGS += $(libxml2_CFLAGS)
+  librdf___la_LIBADD += $(libxml2_LIBS)
   librdf___la_SOURCES += writer/trix.cc
 endif
