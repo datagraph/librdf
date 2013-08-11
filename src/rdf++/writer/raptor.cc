@@ -77,9 +77,7 @@ void
 writer::raptor::initialize(const std::string& base_uri,
                            std::function<raptor_iostream* ()> make_raptor_iostream) {
   const format* const format = format::find_for_content_type(_content_type);
-  if (format == nullptr) {
-    throw std::invalid_argument("unknown content type: " + _content_type);
-  }
+  assert(format != nullptr);
 
   const char* const serializer_name = format->serializer_name;
   assert(serializer_name != nullptr);
