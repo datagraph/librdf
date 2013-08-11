@@ -84,6 +84,13 @@ AX_ARG_ENABLE_FORMAT([turtle], [Turtle])  # --enable-turtle/--disable-turtle
 dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
 AX_BOOST_BASE([1.48], [AX_BOOST_UNIT_TEST_FRAMEWORK])
+# libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
+AS_IF([test "x$enable_trix" != "xno"], [
+  AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],
+    AC_SEARCH_LIBS([xmlTextWriterStartDocument], [xml2], [],
+      AC_MSG_ERROR([*** Shared library libxml2 not found; install http://xmlsoft.org/ ***])),
+    AC_MSG_ERROR([*** Header file <libxml/xmlwriter.h> not found; install http://xmlsoft.org/ ***]))
+])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 AC_CHECK_HEADERS([raptor2/raptor2.h],
   AC_SEARCH_LIBS([raptor_new_world_internal], [raptor2], [],

@@ -23,10 +23,12 @@ Build Prerequisites
 Build Dependencies
 ------------------
 
+* libxml2_ (>= 2.7.8), for the TriX format only
 * libraptor2_ (>= 2.0.8)
 * Boost.Utility_ (>= 1.48)
-* Boost.Test_ (>= 1.48) for ``make check`` unit tests only
+* Boost.Test_ (>= 1.48), for ``make check`` unit tests only
 
+.. _libxml2:       http://www.xmlsoft.org/
 .. _libraptor2:    http://librdf.org/raptor/
 .. _Boost.Utility: http://www.boost.org/libs/utility/
 .. _Boost.Test:    http://www.boost.org/libs/test/
