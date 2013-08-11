@@ -11,17 +11,8 @@
 
 using namespace rdf;
 
-typedef struct rdf_format {
-  const char* const content_type;
-  const char* const charset;
-  const char* const file_extension;
-  const char* const module_name;
-  const char* const parser_name;
-  const char* const serializer_name;
-} rdf_format_t;
-
 /* @see http://librdf.org/raptor/api/raptor-formats-types-by-serializer.html */
-static const rdf_format_t rdf_format_info[] = {
+static const format rdf_format_info[] = {
 #ifndef DISABLE_NQUADS
   /* N-Triples (.nt) */
   {"text/plain",            "ASCII", "nt",     "raptor", "ntriples", "ntriples"},
@@ -83,7 +74,7 @@ bool
 format::supported(const char* const content_type) {
   if (content_type != nullptr) {
     for (unsigned int i = 0; i < rdf_format_count; i++) {
-      const rdf_format_t* const format_info = &rdf_format_info[i];
+      const format* const format_info = &rdf_format_info[i];
       if (std::strcmp(content_type, format_info->content_type) == 0) {
         return true; /* found */
       }
@@ -93,14 +84,14 @@ format::supported(const char* const content_type) {
   return false; /* not found */
 }
 
-const char*
-format::find_writer_name_for(const char* const content_type) {
+const format*
+format::find_for_content_type(const char* const content_type) {
   assert(content_type != nullptr);
 
   for (unsigned int i = 0; i < rdf_format_count; i++) {
-    const rdf_format_t* const format_info = &rdf_format_info[i];
+    const format* const format_info = &rdf_format_info[i];
     if (std::strcmp(content_type, format_info->content_type) == 0) {
-      return format_info->serializer_name; /* found */
+      return format_info;
     }
   }
 
