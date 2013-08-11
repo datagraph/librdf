@@ -6,9 +6,16 @@
 
 #include "rdf++/format.h"
 #include "rdf++/writer/impl.h"
+
+#ifndef DISABLE_JSONLD
 #include "rdf++/writer/jsonld.h"
+#endif
+
 #include "rdf++/writer/raptor.h"
+
+#ifndef DISABLE_TRIX
 #include "rdf++/writer/trix.h"
+#endif
 
 #include <cstring> /* for std::strcmp() */
 
@@ -28,13 +35,17 @@ writer::implementation::create(const std::string& file_path,
     return new writer::raptor(file_path, content_type, charset, base_uri);
   }
 
+#ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     //return new writer::jsonld(file_path, content_type, charset, base_uri);
   }
+#endif
 
+#ifndef DISABLE_TRIX
   if (std::strcmp("trix", format->module_name) == 0) {
     return new writer::trix(file_path, content_type, charset, base_uri);
   }
+#endif
 
   throw std::invalid_argument("unknown content type: " + content_type);
 }
@@ -53,13 +64,17 @@ writer::implementation::create(std::ostream& stream,
     return new writer::raptor(stream, content_type, charset, base_uri);
   }
 
+#ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     //return new writer::jsonld(stream, content_type, charset, base_uri);
   }
+#endif
 
+#ifndef DISABLE_TRIX
   if (std::strcmp("trix", format->module_name) == 0) {
     return new writer::trix(stream, content_type, charset, base_uri);
   }
+#endif
 
   throw std::invalid_argument("unknown content type: " + content_type);
 }
@@ -78,13 +93,17 @@ writer::implementation::create(FILE* const stream,
     return new writer::raptor(stream, content_type, charset, base_uri);
   }
 
+#ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     //return new writer::jsonld(stream, content_type, charset, base_uri);
   }
+#endif
 
+#ifndef DISABLE_TRIX
   if (std::strcmp("trix", format->module_name) == 0) {
     return new writer::trix(stream, content_type, charset, base_uri);
   }
+#endif
 
   throw std::invalid_argument("unknown content type: " + content_type);
 }
