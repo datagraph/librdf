@@ -15,46 +15,65 @@ typedef struct rdf_format {
   const char* const content_type;
   const char* const charset;
   const char* const file_extension;
+  const char* const module_name;
   const char* const parser_name;
   const char* const serializer_name;
 } rdf_format_t;
 
 /* @see http://librdf.org/raptor/api/raptor-formats-types-by-serializer.html */
 static const rdf_format_t rdf_format_info[] = {
+#ifndef DISABLE_NQUADS
   /* N-Triples (.nt) */
-  {"text/plain",            nullptr, "nt",   "ntriples", "ntriples"},
-  {"text/ntriples",         nullptr, nullptr, "ntriples", "ntriples"},      /* unofficial, by analogy with Turtle */
-  {"text/x-ntriples",       nullptr, nullptr, "ntriples", "ntriples"},      /* unofficial, by analogy with N-Quads */
+  {"text/plain",            "ASCII", "nt",     "raptor", "ntriples", "ntriples"},
+  {"text/ntriples",         nullptr, nullptr,  "raptor", "ntriples", "ntriples"},      /* unofficial, by analogy with Turtle */
+  {"text/x-ntriples",       nullptr, nullptr,  "raptor", "ntriples", "ntriples"},      /* unofficial, by analogy with N-Quads */
   /* N-Quads (.nq) */
-  {"text/nquads",           nullptr, nullptr, "nquads", "nquads"},          /* unofficial, by analogy with Turtle */
-  {"text/x-nquads",         nullptr, "nq",    "nquads", "nquads"},
+  {"text/nquads",           nullptr, nullptr,  "raptor", "nquads", "nquads"},          /* unofficial, by analogy with Turtle */
+  {"text/x-nquads",         nullptr, "nq",     "raptor", "nquads", "nquads"},
+#endif
+#ifndef DISABLE_TURTLE
   /* Turtle (.ttl) */
-  {"text/turtle",           nullptr, "ttl",   "turtle", "turtle"},          /* official */
-  {"application/turtle",    nullptr, nullptr, "turtle", "turtle"},
-  {"application/x-turtle",  nullptr, nullptr, "turtle", "turtle"},          /* unofficial, deprecated */
+  {"text/turtle",           nullptr, "ttl",    "raptor", "turtle", "turtle"},          /* official */
+  {"application/turtle",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
+  {"application/x-turtle",  nullptr, nullptr,  "raptor", "turtle", "turtle"},          /* unofficial, deprecated */
   /* Notation3 (.n3) */
-  {"text/n3",               nullptr, "n3",    "turtle", "turtle"},          /* official */
-  {"text/rdf+n3",           nullptr, nullptr, "turtle", "turtle"},
-  {"application/rdf+n3",    nullptr, nullptr, "turtle", "turtle"},
+  {"text/n3",               nullptr, "n3",     "raptor", "turtle", "turtle"},          /* official */
+  {"text/rdf+n3",           nullptr, nullptr,  "raptor", "turtle", "turtle"},
+  {"application/rdf+n3",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
+#endif
+#ifndef DISABLE_TRIG
+  {"application/trig",      nullptr, "trig",   "raptor", "trig",   nullptr},
+#endif
+#ifndef DISABLE_TRIX
+  {"application/trix",      nullptr, "trix",   "trix",   nullptr,  nullptr},
+#endif
+#ifndef DISABLE_RDFXML
   /* RDF/XML (.rdf) */
 #if 1
-  {"application/rdf+xml",   nullptr, "rdf",   "rdfxml", "rdfxml",},
+  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml",},
 #else
-  {"application/rdf+xml",   nullptr, "rdf",   "rdfxml", "rdfxml-abbrev",},
+  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml-abbrev",},
+#endif
 #endif
   /* RDF/JSON (.json) */
-  {"application/json",      nullptr, "json",  "json", "json"},
-  {"text/json",             nullptr, nullptr, "json", "json"},              /* unofficial, deprecated */
+  {"application/json",      nullptr, "json",   "raptor", "json", "json"},
+  {"text/json",             nullptr, nullptr,  "raptor", "json", "json"},              /* unofficial, deprecated */
+#ifndef DISABLE_JSONLD
+  /* JSON-LD (.jsonld) */
+  {"application/ld+json",   nullptr, "jsonld", "jsonld", nullptr, nullptr},
+#endif
+#if 1
   /* Graphviz (.dot) */
-  {"text/x-graphviz",       nullptr, "dot",   nullptr, "dot"},
+  {"text/x-graphviz",       nullptr, "dot",    "raptor", nullptr, "dot"},
   /* HTML/XHTML (.html) */
-  {"application/xhtml+xml", nullptr, nullptr, "rdfa", "html"},              /* XHTML 1.0 */
-  {"text/html",             nullptr, nullptr, "rdfa", "html"},              /* HTML5 */
+  {"application/xhtml+xml", nullptr, nullptr,  "raptor", "rdfa", "html"},              /* XHTML 1.0 */
+  {"text/html",             nullptr, nullptr,  "raptor", "rdfa", "html"},              /* HTML5 */
   /* RSS 1.0 (.rss) */
-  {"application/rss+xml",   nullptr, nullptr, "rss-tag-soup", "rss-1.0"},
+  {"application/rss+xml",   nullptr, nullptr,  "raptor", "rss-tag-soup", "rss-1.0"},
   /* Atom (.xml) */
-  {"application/atom+xml",  nullptr, nullptr, "rss-tag-soup", "atom"},
-  {nullptr, nullptr, nullptr, nullptr, nullptr},
+  {"application/atom+xml",  nullptr, nullptr,  "raptor", "rss-tag-soup", "atom"},
+#endif
+  {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
 };
 
 static const unsigned int rdf_format_count =
