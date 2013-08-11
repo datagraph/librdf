@@ -75,6 +75,8 @@ format::supported(const char* const content_type) {
   if (content_type != nullptr) {
     for (unsigned int i = 0; i < rdf_format_count; i++) {
       const format* const format_info = &rdf_format_info[i];
+      assert(format_info->content_type != nullptr);
+
       if (std::strcmp(content_type, format_info->content_type) == 0) {
         return true; /* found */
       }
@@ -90,6 +92,8 @@ format::find_for_content_type(const char* const content_type) {
 
   for (unsigned int i = 0; i < rdf_format_count; i++) {
     const format* const format_info = &rdf_format_info[i];
+    assert(format_info->content_type != nullptr);
+
     if (std::strcmp(content_type, format_info->content_type) == 0) {
       return format_info;
     }

@@ -228,6 +228,8 @@ writer::raptor::write_triple(const triple& triple) {
   write_statement();
 
   raptor_statement_clear(_statement);
+
+  _count++;
 }
 
 void
@@ -244,4 +246,6 @@ writer::raptor::write_quad(const quad& quad) {
   write_statement();
 
   raptor_statement_clear(_statement);
+
+  _count++;
 }

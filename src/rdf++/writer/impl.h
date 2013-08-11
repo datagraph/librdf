@@ -5,6 +5,8 @@
 
 #include "rdf++/writer.h"
 
+#include <cstddef> /* for std::size_t */
+
 class rdf::writer::implementation : private boost::noncopyable {
   public:
     static writer::implementation* create(
@@ -39,6 +41,8 @@ class rdf::writer::implementation : private boost::noncopyable {
 
   protected:
     implementation() {}
+
+    std::size_t _count = 0;
 };
 
 #endif /* RDFXX_WRITER_IMPL_H */
