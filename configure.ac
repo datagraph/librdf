@@ -86,7 +86,7 @@ dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
 AX_BOOST_BASE([1.48], [AX_BOOST_UNIT_TEST_FRAMEWORK])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
-PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.8])
+PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_trix" != "xno"], [
   PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])

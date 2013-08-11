@@ -25,7 +25,7 @@ Build Prerequisites
 Build Dependencies
 ------------------
 
-* libraptor2_ (>= 2.0.8)
+* libraptor2_ (>= 2.0.6)
 * libxml2_ (>= 2.7.8), for the TriX format only
 * Boost.Utility_ (>= 1.48)
 * Boost.Test_ (>= 1.48), for ``make check`` unit tests only
