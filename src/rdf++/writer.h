@@ -15,8 +15,8 @@
 #include <boost/noncopyable.hpp>
 
 namespace rdf {
-  class triple;
-  class quad;
+  struct triple;
+  struct quad;
 
   class writer : private boost::noncopyable {
     public:
