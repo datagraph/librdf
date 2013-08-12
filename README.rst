@@ -13,7 +13,7 @@ Build Prerequisites
 * Autoconf_ (>= 2.68)
 * Automake_ (>= 1.11)
 * Libtool_ (>= 2.2)
-* pkg-config (>= 0.24)
+* pkg-config_ (>= 0.24)
 
 .. _Clang:      http://clang.llvm.org/
 .. _GCC:        http://gcc.gnu.org/
