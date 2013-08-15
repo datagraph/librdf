@@ -27,11 +27,13 @@ Build Dependencies
 
 * libraptor2_ (>= 2.0.6)
 * libxml2_ (>= 2.7.8), for the TriX format only
+* XQilla_ (>= 2.3), for the XSLT pipeline only
 * Boost.Utility_ (>= 1.48)
 * Boost.Test_ (>= 1.48), for ``make check`` unit tests only
 
 .. _libraptor2:    http://librdf.org/raptor/
 .. _libxml2:       http://www.xmlsoft.org/
+.. _XQilla:        http://xqilla.sourceforge.net/
 .. _Boost.Utility: http://www.boost.org/libs/utility/
 .. _Boost.Test:    http://www.boost.org/libs/test/
 

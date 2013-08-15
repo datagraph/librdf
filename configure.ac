@@ -91,6 +91,13 @@ PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
 AS_IF([test "x$enable_trix" != "xno"], [
   PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])
 ])
+# libxqilla (libxqilla-dev on Ubuntu, xqilla on Mac OS X + MacPorts)
+AS_IF([test "x$enable_rdfxml" != "xno"], [
+  AC_CHECK_HEADERS([xqilla/xqilla-simple.hpp],
+    AC_SEARCH_LIBS([createXQillaXQCImplementation], [xqilla], [],
+      AC_MSG_ERROR([*** Shared library libxqilla not found; install http://xqilla.sourceforge.net/ ***])),
+    AC_MSG_ERROR([*** Header file <xqilla/xqilla-simple.hpp> not found; install http://xqilla.sourceforge.net/ ***]))
+])
 
 dnl Check for header files:
 
