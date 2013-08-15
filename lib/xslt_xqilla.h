@@ -83,8 +83,7 @@ class xslt_processor {
   }
 
 public:
-  xslt_processor()
-    : _context(create_context(_xqilla)) {}
+  xslt_processor() {}
 
   XQQuery* parse_from_url(const std::string& url) {
     return parse_from_url(url.c_str());
@@ -92,22 +91,15 @@ public:
 
   XQQuery* parse_from_url(const char* const url) {
     try {
-      return _xqilla.parseFromURI(X(url), _context.get(),
-        XQilla::Flags::NO_ADOPT_CONTEXT);
+      return _xqilla.parseFromURI(X(url), create_context(_xqilla));
     }
     catch (const XQException& error) {
       throw xslt_error(error);
     }
   }
 
-protected:
-  DynamicContext& context() const noexcept {
-    return *(_context.get());
-  }
-
 private:
   XQilla _xqilla;
-  AutoDelete<DynamicContext> _context = {nullptr};
 };
 
 /**
