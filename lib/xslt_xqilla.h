@@ -8,6 +8,7 @@
 #include <cassert>   /* for assert() */
 #include <cstdio>    /* for FILE, std::fflush(), std::fwrite() */
 #include <stdexcept> /* for std::runtime_error */
+#include <string>    /* for std::string */
 
 namespace {
   /**
@@ -37,7 +38,7 @@ namespace {
                             xercesc::XMLFormatter* const formatter) override {
       const XMLSize_t written = std::fwrite(data, sizeof(XMLByte), count, _stream);
       if (written != count) {
-        ThrowXML(xercesc::XMLPlatformUtilsException,
+        ThrowXML(xercesc::XMLPlatformUtilsException, // TODO: wrap error class
           xercesc::XMLExcepts::File_CouldNotWriteToFile);
       }
     }
@@ -58,7 +59,12 @@ namespace {
  */
 class xslt_error : public std::runtime_error {
 public:
-  xslt_error(const char* const what) : std::runtime_error(what) {}
+  xslt_error(const XQException& error)
+    : std::runtime_error(UTF8(error.getError())),
+      _error(error) {}
+
+private:
+  const XQException& _error;
 };
 
 /**
@@ -67,22 +73,35 @@ public:
  * @see http://xqilla.sourceforge.net/docs/simple-api/classXQilla.html
  */
 class xslt_processor {
+  static DynamicContext* create_context(const XQilla& xqilla) {
+    try {
+      return xqilla.createContext(XQilla::XSLT2);
+    }
+    catch (const XQException& error) {
+      throw xslt_error(error);
+    }
+  }
+
 public:
   xslt_processor()
-    : _context(_xqilla.createContext(XQilla::XSLT2)) {
-  }
+    : _context(create_context(_xqilla)) {}
 
   XQQuery* parse_from_url(const std::string& url) {
     return parse_from_url(url.c_str());
   }
 
   XQQuery* parse_from_url(const char* const url) {
-    return _xqilla.parseFromURI(X(url), _context.get(),
-      XQilla::Flags::NO_ADOPT_CONTEXT);
+    try {
+      return _xqilla.parseFromURI(X(url), _context.get(),
+        XQilla::Flags::NO_ADOPT_CONTEXT);
+    }
+    catch (const XQException& error) {
+      throw xslt_error(error);
+    }
   }
 
 protected:
-  DynamicContext& context() const {
+  DynamicContext& context() const noexcept {
     return *(_context.get());
   }
 
@@ -107,29 +126,39 @@ public:
                 const std::string& url)
     : _query(processor.parse_from_url(url)) {}
 
-  void execute(const char* const input,
+  void execute(const char* const input_url,
                FILE* const output) {
-    AutoDelete<DynamicContext> context(_query->createDynamicContext());
-    XPath2MemoryManager* const mm = context->getMemoryManager();
+    try {
+      AutoDelete<DynamicContext> context(_query->createDynamicContext());
+      XPath2MemoryManager* const mm = context->getMemoryManager();
 
-    const Sequence seq = context->resolveDocument(X(input));
-    if (!seq.isEmpty() && seq.first()->isNode()) {
-      context->setContextItem(seq.first());
-      context->setContextPosition(1);
-      context->setContextSize(1);
+      const Sequence seq = context->resolveDocument(X(input_url));
+      if (!seq.isEmpty() && seq.first()->isNode()) {
+        context->setContextItem(seq.first());
+        context->setContextPosition(1);
+        context->setContextSize(1);
+      }
+
+      xslt_format_target target(output);
+      EventSerializer writer("UTF-8", "1.0", &target, mm);
+      writer.addNewlines(true);
+      NSFixupFilter nsfilter(&writer, mm);
+
+      _query->execute(&nsfilter, context);
     }
-
-    xslt_format_target target(output);
-    EventSerializer writer("UTF-8", "1.0", &target, mm);
-    writer.addNewlines(true);
-    NSFixupFilter nsfilter(&writer, mm);
-
-    _query->execute(&nsfilter, context);
+    catch (const XQException& error) {
+      throw xslt_error(error);
+    }
   }
 
   void execute(FILE* const input,
                FILE* const output) {
-    (void)input, (void)output; // TODO: implement xslt_input_source
+    try {
+      (void)input, (void)output; // TODO: implement xslt_input_source
+    }
+    catch (const XQException& error) {
+      throw xslt_error(error);
+    }
   }
 
 private:
