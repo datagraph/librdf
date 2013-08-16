@@ -14,56 +14,76 @@
 
 #include <cassert>    /* for assert() */
 #include <functional> /* for std::function */
-#include <iostream>   /* for std::cerr, std::endl */
 #include <new>        /* for std::bad_alloc */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 
 #include <raptor2/raptor2.h> /* for raptor_*() */
 
-using namespace rdf;
+namespace {
+class implementation : public rdf::writer::implementation {
+  public:
+    implementation(
+      FILE* stream,
+      const char* content_type,
+      const char* charset,
+      const char* base_uri);
+
+    virtual ~implementation() override;
+
+    virtual void begin() override;
+
+    virtual void finish() override;
+
+    virtual void flush() override;
+
+    virtual void write_triple(const rdf::triple& triple) override;
+
+    virtual void write_quad(const rdf::quad& quad) override;
+
+    static void log_callback(void* user_data, raptor_log_message* message);
+
+  private:
+    const std::string _content_type;
+    const std::string _charset;
+    raptor_world* _world = nullptr;
+    raptor_uri* _base_uri = nullptr;
+    raptor_iostream* _iostream = nullptr;
+    raptor_serializer* _serializer = nullptr;
+    raptor_statement* _statement = nullptr;
+
+    void initialize(const char* base_uri, std::function<raptor_iostream* ()> make_raptor_iostream);
+
+    raptor_term* make_raptor_term(const rdf::term_position pos, const rdf::term& term);
+
+    void write_statement();
+};
+}
+
+rdf::writer::implementation*
+rdf_writer_for_raptor(FILE* const stream,
+                      const char* const content_type,
+                      const char* const charset,
+                      const char* const base_uri) {
+  return new implementation(stream, content_type, charset, base_uri);
+}
 
 /**
  * @see http://librdf.org/raptor/api/raptor2-section-general.html#raptor-log-handler
  */
 void
-writer::raptor::log_callback(void* const user_data,
+implementation::log_callback(void* const user_data,
                              raptor_log_message* const message) {
-  auto writer_impl = reinterpret_cast<writer::raptor*>(user_data);
-  assert(writer_impl != nullptr);
+  //auto writer_impl = reinterpret_cast<implementation*>(user_data);
+  //assert(writer_impl != nullptr);
   assert(message != nullptr);
 
-  fprintf(stderr, "writer::raptor::log_callback(%p, %p): %s\n", user_data, message, message->text);
+  fprintf(stderr, "implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
 }
 
-writer::raptor::raptor(const std::string& file_path,
-                       const std::string& content_type,
-                       const std::string& charset,
-                       const std::string& base_uri)
-  : _content_type(content_type),
-    _charset(charset) {
-  assert(!file_path.empty());
-
-  initialize(base_uri, [this, &file_path]() -> raptor_iostream* {
-    return raptor_new_iostream_to_filename(_world, file_path.c_str());
-  });
-}
-
-writer::raptor::raptor(std::ostream& stream,
-                       const std::string& content_type,
-                       const std::string& charset,
-                       const std::string& base_uri)
-  : _content_type(content_type),
-    _charset(charset) {
-
-  initialize(base_uri, [this, &stream]() -> raptor_iostream* {
-    return raptor_new_iostream_to_std_ostream(_world, &stream);
-  });
-}
-
-writer::raptor::raptor(FILE* const stream,
-                       const std::string& content_type,
-                       const std::string& charset,
-                       const std::string& base_uri)
+implementation::implementation(FILE* const stream,
+                               const char* const content_type,
+                               const char* const charset,
+                               const char* const base_uri)
   : _content_type(content_type),
     _charset(charset) {
   assert(stream != nullptr);
@@ -74,9 +94,9 @@ writer::raptor::raptor(FILE* const stream,
 }
 
 void
-writer::raptor::initialize(const std::string& base_uri,
+implementation::initialize(const char* const base_uri,
                            std::function<raptor_iostream* ()> make_raptor_iostream) {
-  const format* const format = format::find_for_content_type(_content_type);
+  const rdf::format* const format = rdf::format::find_for_content_type(_content_type);
   assert(format != nullptr);
 
   const char* const serializer_name = format->serializer_name;
@@ -86,10 +106,10 @@ writer::raptor::initialize(const std::string& base_uri,
   if (_world == nullptr) {
     throw std::bad_alloc(); /* out of memory */
   }
-  raptor_world_set_log_handler(_world, this, writer::raptor::log_callback);
+  raptor_world_set_log_handler(_world, this, implementation::log_callback);
   raptor_world_open(_world);
 
-  _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri.c_str());
+  _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri);
   if (_base_uri == nullptr) {
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -120,7 +140,7 @@ writer::raptor::initialize(const std::string& base_uri,
   }
 }
 
-writer::raptor::~raptor() {
+implementation::~implementation() {
   if (_statement != nullptr) {
     raptor_free_statement(_statement), _statement = nullptr;
   }
@@ -143,7 +163,7 @@ writer::raptor::~raptor() {
 }
 
 void
-writer::raptor::begin() {
+implementation::begin() {
   const int rc = raptor_serializer_start_to_iostream(_serializer, _base_uri, _iostream);
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_start_to_iostream() failed");
@@ -151,7 +171,7 @@ writer::raptor::begin() {
 }
 
 void
-writer::raptor::finish() {
+implementation::finish() {
   const int rc = raptor_serializer_serialize_end(_serializer);
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_serialize_end() failed");
@@ -159,7 +179,7 @@ writer::raptor::finish() {
 }
 
 void
-writer::raptor::flush() {
+implementation::flush() {
   const int rc = raptor_serializer_flush(_serializer);
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_flush() failed");
@@ -167,8 +187,9 @@ writer::raptor::flush() {
 }
 
 raptor_term*
-writer::raptor::make_raptor_term(const rdf::term_position pos,
+implementation::make_raptor_term(const rdf::term_position pos,
                                  const rdf::term& term) {
+  (void)pos;
   switch (term.type) {
     case rdf::term_type::none: { /* the default context only */
       assert(pos == rdf::term_position::context);
@@ -210,7 +231,7 @@ writer::raptor::make_raptor_term(const rdf::term_position pos,
 }
 
 void
-writer::raptor::write_statement() {
+implementation::write_statement() {
   const int rc = raptor_serializer_serialize_statement(_serializer, _statement);
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_serialize_statement() failed");
@@ -218,7 +239,7 @@ writer::raptor::write_statement() {
 }
 
 void
-writer::raptor::write_triple(const triple& triple) {
+implementation::write_triple(const rdf::triple& triple) {
   raptor_statement_clear(_statement);
 
   _statement->subject   = make_raptor_term(rdf::term_position::subject,   *triple.subject);
@@ -233,7 +254,7 @@ writer::raptor::write_triple(const triple& triple) {
 }
 
 void
-writer::raptor::write_quad(const quad& quad) {
+implementation::write_quad(const rdf::quad& quad) {
   raptor_statement_clear(_statement);
 
   _statement->subject   = make_raptor_term(rdf::term_position::subject,   *quad.subject);

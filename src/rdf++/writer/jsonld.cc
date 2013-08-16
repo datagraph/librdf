@@ -6,72 +6,11 @@
 
 #include "rdf++/writer/jsonld.h"
 
-using namespace rdf;
-
-class writer::jsonld : public writer::implementation {
-  public:
-    jsonld();
-
-    jsonld(
-      const std::string& file_path,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
-
-    jsonld(
-      std::ostream& stream,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
-
-    jsonld(
-      FILE* stream,
-      const std::string& content_type,
-      const std::string& charset,
-      const std::string& base_uri);
-
-    virtual ~jsonld() override;
-
-    virtual void begin() override;
-
-    virtual void finish() override;
-
-    virtual void flush() override;
-
-    virtual void write_triple(const triple& triple) override;
-
-    virtual void write_quad(const quad& quad) override;
-};
-
-writer::jsonld::jsonld() {
-  // TODO
-}
-
-writer::jsonld::~jsonld() {
-  // TODO
-}
-
-void
-writer::jsonld::begin() {
-  // TODO
-}
-
-void
-writer::jsonld::finish() {
-  // TODO
-}
-
-void
-writer::jsonld::flush() {
-  // TODO
-}
-
-void
-writer::jsonld::write_triple(const triple& triple) {
-  (void)triple; // TODO
-}
-
-void
-writer::jsonld::write_quad(const quad& quad) {
-  (void)quad; // TODO
+rdf::writer::implementation*
+rdf_writer_for_jsonld(FILE* const stream,
+                      const char* const content_type,
+                      const char* const charset,
+                      const char* const base_uri) {
+  (void)stream, (void)content_type, (void)charset, (void)base_uri;
+  return nullptr; // TODO
 }

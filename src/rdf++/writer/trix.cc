@@ -8,29 +8,68 @@
 
 #include <cassert> /* for assert() */
 
+#include <libxml/xmlwriter.h>
+
+namespace {
+class implementation : public rdf::writer::implementation {
+public:
+  implementation(
+    FILE* stream,
+    const char* content_type,
+    const char* charset,
+    const char* base_uri);
+
+  virtual ~implementation() override;
+
+  virtual void begin() override;
+
+  virtual void finish() override;
+
+  virtual void flush() override;
+
+  virtual void write_triple(const rdf::triple& triple) override;
+
+  virtual void write_quad(const rdf::quad& quad) override;
+
+protected:
+  void write_term(const rdf::term& term);
+
+  void begin_document();
+
+  void finish_document();
+
+  void write_element(const char* name, const char* text);
+
+  void begin_element(const char* name);
+
+  void begin_element_with_ns(const char* name, const char* ns);
+
+  void finish_element();
+
+  void write_attribute(const char* name, const char* value);
+
+  void write_text(const char* text);
+
+private:
+  xmlTextWriterPtr _writer = nullptr;
+  rdf::uri_reference _context = {""};
+};
+}
+
+rdf::writer::implementation*
+rdf_writer_for_trix(FILE* const stream,
+                    const char* const content_type,
+                    const char* const charset,
+                    const char* const base_uri) {
+  return new implementation(stream, content_type, charset, base_uri);
+}
+
 using namespace rdf;
 
-writer::trix::trix(const std::string& file_path,
-                   const std::string& content_type,
-                   const std::string& charset,
-                   const std::string& base_uri) {
-  assert(!file_path.empty());
-  (void)file_path, (void)content_type, (void)charset, (void)base_uri;
-  throw std::runtime_error("not implemented"); // TODO
-}
-
-writer::trix::trix(std::ostream& stream,
-                   const std::string& content_type,
-                   const std::string& charset,
-                   const std::string& base_uri) {
-  (void)stream, (void)content_type, (void)charset, (void)base_uri;
-  throw std::runtime_error("not implemented"); // TODO
-}
-
-writer::trix::trix(FILE* const stream,
-                   const std::string& content_type,
-                   const std::string& charset,
-                   const std::string& base_uri) {
+implementation::implementation(FILE* const stream,
+                               const char* const content_type,
+                               const char* const charset,
+                               const char* const base_uri) {
   assert(stream != nullptr);
   (void)content_type, (void)charset, (void)base_uri;
 
@@ -46,7 +85,7 @@ writer::trix::trix(FILE* const stream,
   }
 }
 
-writer::trix::~trix() {
+implementation::~implementation() {
   if (_writer != nullptr) {
     xmlFreeTextWriter(_writer);
     _writer = nullptr;
@@ -54,7 +93,7 @@ writer::trix::~trix() {
 }
 
 void
-writer::trix::begin() {
+implementation::begin() {
   xmlTextWriterSetIndent(_writer, 1);
   xmlTextWriterSetIndentString(_writer, reinterpret_cast<const xmlChar*>("  ")); /* two spaces */
 
@@ -66,7 +105,7 @@ writer::trix::begin() {
 }
 
 void
-writer::trix::finish() {
+implementation::finish() {
   if (_count) {
     finish_element(); /* </graph> */
   }
@@ -77,13 +116,13 @@ writer::trix::finish() {
 }
 
 void
-writer::trix::flush() {
+implementation::flush() {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterFlush */
   xmlTextWriterFlush(_writer);
 }
 
 void
-writer::trix::write_triple(const triple& triple) {
+implementation::write_triple(const rdf::triple& triple) {
   const bool context_changed = !_context.string.empty();
 
   if (context_changed || !_count) {
@@ -104,7 +143,7 @@ writer::trix::write_triple(const triple& triple) {
 }
 
 void
-writer::trix::write_quad(const quad& quad) {
+implementation::write_quad(const rdf::quad& quad) {
   const bool context_changed = (!quad.context) ?
     _context.string.empty() :
     (_context.string.compare((*quad.context).string) == 0);
@@ -134,7 +173,7 @@ writer::trix::write_quad(const quad& quad) {
 }
 
 void
-writer::trix::write_term(const term& term_) {
+implementation::write_term(const rdf::term& term_) {
   switch (term_.type) {
     case term_type::uri_reference: {
       const auto& term = dynamic_cast<const uri_reference&>(term_);
@@ -171,20 +210,20 @@ writer::trix::write_term(const term& term_) {
 }
 
 void
-writer::trix::begin_document() {
+implementation::begin_document() {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterStartDocument */
   xmlTextWriterStartDocument(_writer, "1.0", "UTF-8", nullptr);
 }
 
 void
-writer::trix::finish_document() {
+implementation::finish_document() {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterEndDocument */
   xmlTextWriterEndDocument(_writer);
 }
 
 void
-writer::trix::write_element(const char* const name,
-                            const char* const text) {
+implementation::write_element(const char* const name,
+                              const char* const text) {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterWriteElement */
   xmlTextWriterWriteElement(_writer,
     reinterpret_cast<const xmlChar*>(name),
@@ -192,15 +231,15 @@ writer::trix::write_element(const char* const name,
 }
 
 void
-writer::trix::begin_element(const char* const name) {
+implementation::begin_element(const char* const name) {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterStartElement */
   xmlTextWriterStartElement(_writer,
     reinterpret_cast<const xmlChar*>(name));
 }
 
 void
-writer::trix::begin_element_with_ns(const char* const name,
-                                    const char* const ns) {
+implementation::begin_element_with_ns(const char* const name,
+                                      const char* const ns) {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterStartElementNS */
   xmlTextWriterStartElementNS(_writer, nullptr,
     reinterpret_cast<const xmlChar*>(name),
@@ -208,7 +247,7 @@ writer::trix::begin_element_with_ns(const char* const name,
 }
 
 void
-writer::trix::finish_element() {
+implementation::finish_element() {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterEndElement */
   //xmlTextWriterEndElement(_writer);
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterFullEndElement */
@@ -216,8 +255,8 @@ writer::trix::finish_element() {
 }
 
 void
-writer::trix::write_attribute(const char* const name,
-                              const char* const value) {
+implementation::write_attribute(const char* const name,
+                                const char* const value) {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterWriteAttribute */
   xmlTextWriterWriteAttribute(_writer,
     reinterpret_cast<const xmlChar*>(name),
@@ -225,7 +264,7 @@ writer::trix::write_attribute(const char* const name,
 }
 
 void
-writer::trix::write_text(const char* const text) {
+implementation::write_text(const char* const text) {
   /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterWriteString */
   xmlTextWriterWriteString(_writer,
     reinterpret_cast<const xmlChar*>(text));

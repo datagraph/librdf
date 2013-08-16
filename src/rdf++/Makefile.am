@@ -18,9 +18,7 @@ librdf___la_SOURCES =     \
   term.cc                 \
   triple.cc               \
   version.cc              \
-  writer.cc               \
-  writer/impl.cc          \
-  writer/raptor.cc
+  writer.cc
 
 base_pkgincludedir = $(includedir)/rdf++
 
@@ -38,6 +36,10 @@ base_pkginclude_HEADERS = \
 
 if !DISABLE_JSONLD
   librdf___la_SOURCES += writer/jsonld.cc
+endif
+
+if !DISABLE_NQUADS
+  librdf___la_SOURCES += writer/raptor.cc
 endif
 
 if !DISABLE_TRIX

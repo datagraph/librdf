@@ -79,8 +79,8 @@ class reader::implementation : private boost::noncopyable {
 void
 reader::implementation::log_callback(void* const user_data,
                                      raptor_log_message* const message) {
-  auto reader_impl = reinterpret_cast<reader::implementation*>(user_data);
-  assert(reader_impl != nullptr);
+  //auto reader_impl = reinterpret_cast<reader::implementation*>(user_data);
+  //assert(reader_impl != nullptr);
   assert(message != nullptr);
 
   fprintf(stderr, "reader::implementation::log_callback(%p, %p): message=%s locator=%d:%d\n",

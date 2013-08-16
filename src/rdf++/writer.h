@@ -54,14 +54,9 @@ namespace rdf {
 
       void write_quad(const quad& quad);
 
-      class implementation;
+      struct implementation;
 
     private:
-
-      class jsonld;
-      class raptor;
-      class trix;
-
       std::unique_ptr<implementation> _implementation;
   };
 }
