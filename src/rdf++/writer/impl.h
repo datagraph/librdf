@@ -14,7 +14,7 @@ protected:
   implementation() noexcept {}
 
 public:
-  virtual ~implementation() {}
+  virtual ~implementation() noexcept {}
 
   virtual void begin() {}
 

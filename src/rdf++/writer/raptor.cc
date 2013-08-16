@@ -20,26 +20,20 @@
 #include <raptor2/raptor2.h> /* for raptor_*() */
 
 namespace {
-class implementation : public rdf::writer::implementation {
-  public:
-    implementation(
-      FILE* stream,
+  struct implementation : public rdf::writer::implementation {
+    implementation(FILE* stream,
       const char* content_type,
       const char* charset,
       const char* base_uri);
-
-    virtual ~implementation() override;
-
+    virtual ~implementation() noexcept override;
     virtual void begin() override;
-
     virtual void finish() override;
-
+    virtual void write_triple(const rdf::triple& triple) override;
+    virtual void write_quad(const rdf::quad& quad) override;
+    virtual void write_comment(const char* comment) override;
     virtual void flush() override;
 
-    virtual void write_triple(const rdf::triple& triple) override;
-
-    virtual void write_quad(const rdf::quad& quad) override;
-
+  public:
     static void log_callback(void* user_data, raptor_log_message* message);
 
   private:
@@ -56,7 +50,7 @@ class implementation : public rdf::writer::implementation {
     raptor_term* make_raptor_term(const rdf::term_position pos, const rdf::term& term);
 
     void write_statement();
-};
+  };
 }
 
 rdf::writer::implementation*
@@ -140,7 +134,7 @@ implementation::initialize(const char* const base_uri,
   }
 }
 
-implementation::~implementation() {
+implementation::~implementation() noexcept {
   if (_statement != nullptr) {
     raptor_free_statement(_statement), _statement = nullptr;
   }
@@ -175,14 +169,6 @@ implementation::finish() {
   const int rc = raptor_serializer_serialize_end(_serializer);
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_serialize_end() failed");
-  }
-}
-
-void
-implementation::flush() {
-  const int rc = raptor_serializer_flush(_serializer);
-  if (rc != 0) {
-    throw std::runtime_error("raptor_serializer_flush() failed");
   }
 }
 
@@ -269,4 +255,17 @@ implementation::write_quad(const rdf::quad& quad) {
   raptor_statement_clear(_statement);
 
   _count++;
+}
+
+void
+implementation::write_comment(const char* const comment) {
+  (void)comment; // TODO
+}
+
+void
+implementation::flush() {
+  const int rc = raptor_serializer_flush(_serializer);
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_flush() failed");
+  }
 }

@@ -11,49 +11,42 @@
 #include <libxml/xmlwriter.h>
 
 namespace {
-class implementation : public rdf::writer::implementation {
-public:
-  implementation(
-    FILE* stream,
-    const char* content_type,
-    const char* charset,
-    const char* base_uri);
+  struct implementation : public rdf::writer::implementation {
+    implementation(FILE* stream,
+      const char* content_type,
+      const char* charset,
+      const char* base_uri);
+    virtual ~implementation() noexcept override;
+    virtual void begin() override;
+    virtual void finish() override;
+    virtual void write_triple(const rdf::triple& triple) override;
+    virtual void write_quad(const rdf::quad& quad) override;
+    virtual void write_comment(const char* comment) override;
+    virtual void flush() override;
 
-  virtual ~implementation() override;
+  protected:
+    void write_term(const rdf::term& term);
 
-  virtual void begin() override;
+    void begin_document();
 
-  virtual void finish() override;
+    void finish_document();
 
-  virtual void flush() override;
+    void write_element(const char* name, const char* text);
 
-  virtual void write_triple(const rdf::triple& triple) override;
+    void begin_element(const char* name);
 
-  virtual void write_quad(const rdf::quad& quad) override;
+    void begin_element_with_ns(const char* name, const char* ns);
 
-protected:
-  void write_term(const rdf::term& term);
+    void finish_element();
 
-  void begin_document();
+    void write_attribute(const char* name, const char* value);
 
-  void finish_document();
+    void write_text(const char* text);
 
-  void write_element(const char* name, const char* text);
-
-  void begin_element(const char* name);
-
-  void begin_element_with_ns(const char* name, const char* ns);
-
-  void finish_element();
-
-  void write_attribute(const char* name, const char* value);
-
-  void write_text(const char* text);
-
-private:
-  xmlTextWriterPtr _writer = nullptr;
-  rdf::uri_reference _context = {""};
-};
+  private:
+    xmlTextWriterPtr _writer = nullptr;
+    rdf::uri_reference _context = {""};
+  };
 }
 
 rdf::writer::implementation*
@@ -63,8 +56,6 @@ rdf_writer_for_trix(FILE* const stream,
                     const char* const base_uri) {
   return new implementation(stream, content_type, charset, base_uri);
 }
-
-using namespace rdf;
 
 implementation::implementation(FILE* const stream,
                                const char* const content_type,
@@ -85,7 +76,7 @@ implementation::implementation(FILE* const stream,
   }
 }
 
-implementation::~implementation() {
+implementation::~implementation() noexcept {
   if (_writer != nullptr) {
     xmlFreeTextWriter(_writer);
     _writer = nullptr;
@@ -113,12 +104,6 @@ implementation::finish() {
   finish_element(); /* </TriX> */
 
   finish_document(); /* EOF */
-}
-
-void
-implementation::flush() {
-  /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterFlush */
-  xmlTextWriterFlush(_writer);
 }
 
 void
@@ -154,7 +139,7 @@ implementation::write_quad(const rdf::quad& quad) {
     }
     begin_element("graph");
     if (quad.context) {
-      const auto& term = dynamic_cast<const uri_reference&>(*quad.context);
+      const auto& term = dynamic_cast<const rdf::uri_reference&>(*quad.context);
       write_element("uri", term.string.c_str());
       _context.string = term.string;
     }
@@ -173,20 +158,31 @@ implementation::write_quad(const rdf::quad& quad) {
 }
 
 void
+implementation::write_comment(const char* const comment) {
+  (void)comment; // TODO
+}
+
+void
+implementation::flush() {
+  /* @see http://www.xmlsoft.org/html/libxml-xmlwriter.html#xmlTextWriterFlush */
+  xmlTextWriterFlush(_writer);
+}
+
+void
 implementation::write_term(const rdf::term& term_) {
   switch (term_.type) {
-    case term_type::uri_reference: {
-      const auto& term = dynamic_cast<const uri_reference&>(term_);
+    case rdf::term_type::uri_reference: {
+      const auto& term = dynamic_cast<const rdf::uri_reference&>(term_);
       write_element("uri", term.string.c_str());
       break;
     }
-    case term_type::blank_node: {
-      const auto& term = dynamic_cast<const blank_node&>(term_);
+    case rdf::term_type::blank_node: {
+      const auto& term = dynamic_cast<const rdf::blank_node&>(term_);
       write_element("id", term.string.c_str());
       break;
     }
-    case term_type::plain_literal: {
-      const auto& term = dynamic_cast<const plain_literal&>(term_);
+    case rdf::term_type::plain_literal: {
+      const auto& term = dynamic_cast<const rdf::plain_literal&>(term_);
       begin_element("plainLiteral");
       if (!term.language_tag.empty()) {
         write_attribute("xml:lang", term.language_tag.c_str());
@@ -195,17 +191,17 @@ implementation::write_term(const rdf::term& term_) {
       finish_element();
       break;
     }
-    case term_type::typed_literal: {
-      const auto& term = dynamic_cast<const typed_literal&>(term_);
+    case rdf::term_type::typed_literal: {
+      const auto& term = dynamic_cast<const rdf::typed_literal&>(term_);
       begin_element("typedLiteral");
       write_attribute("datatype", term.datatype_uri.c_str());
       write_text(term.string.c_str());
       finish_element();
       break;
     }
-    case term_type::none:
+    case rdf::term_type::none:
     default:
-      assert(term.type != term_type::none);
+      assert(term.type != rdf::term_type::none);
   }
 }
 
