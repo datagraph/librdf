@@ -54,6 +54,12 @@ namespace rdf {
 
       void write_quad(const quad& quad);
 
+      void write_comment(const std::string& comment) {
+        write_comment(comment.c_str());
+      }
+
+      void write_comment(const char* comment);
+
       struct implementation;
 
     private:

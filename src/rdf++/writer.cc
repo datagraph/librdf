@@ -127,3 +127,9 @@ writer::write_quad(const quad& quad) {
   assert(_implementation != nullptr);
   _implementation->write_quad(quad);
 }
+
+void
+writer::write_comment(const char* const comment) {
+  assert(_implementation != nullptr);
+  _implementation->write_comment(comment);
+}
