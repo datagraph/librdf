@@ -26,6 +26,7 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
+    virtual void configure(const char* key, const char* value) override;
     virtual void begin() override;
     virtual void finish() override;
     virtual void write_triple(const rdf::triple& triple) override;
@@ -154,6 +155,12 @@ implementation::~implementation() noexcept {
   if (_world != nullptr) {
     raptor_free_world(_world), _world = nullptr;
   }
+}
+
+void
+implementation::configure(const char* const key,
+                          const char* const value) {
+  (void)key, (void)value; // TODO
 }
 
 void

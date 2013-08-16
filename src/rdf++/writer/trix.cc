@@ -17,6 +17,7 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
+    virtual void configure(const char* key, const char* value) override;
     virtual void begin() override;
     virtual void finish() override;
     virtual void write_triple(const rdf::triple& triple) override;
@@ -81,6 +82,12 @@ implementation::~implementation() noexcept {
     xmlFreeTextWriter(_writer);
     _writer = nullptr;
   }
+}
+
+void
+implementation::configure(const char* const key,
+                          const char* const value) {
+  (void)key, (void)value; // TODO
 }
 
 void

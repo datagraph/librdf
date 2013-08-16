@@ -102,6 +102,14 @@ writer::writer(FILE* const stream,
 writer::~writer() = default;
 
 void
+writer::configure(const char* const key,
+                  const char* const value) {
+  assert(_implementation != nullptr);
+  assert(key != nullptr); // FIXME
+  _implementation->configure(key, value);
+}
+
+void
 writer::define_prefix(const std::string& prefix,
                       const std::string& uri_string) {
   assert(_implementation != nullptr);

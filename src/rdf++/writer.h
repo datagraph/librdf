@@ -40,9 +40,15 @@ namespace rdf {
 
       ~writer();
 
-      void define_prefix(
-        const std::string& prefix,
-        const std::string& uri_string);
+      void configure(const std::string& key,
+                     const std::string& value) {
+        configure(key.c_str(), value.c_str());
+      }
+
+      void configure(const char* key, const char* value);
+
+      void define_prefix(const std::string& prefix,
+                         const std::string& uri_string);
 
       void begin();
 

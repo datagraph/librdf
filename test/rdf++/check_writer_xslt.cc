@@ -24,6 +24,7 @@ BOOST_AUTO_TEST_CASE(test_write_triple) {
     rdf::blank_node("bar")
   };
   rdf::writer writer(stdout, "application/xml", "UTF-8", "http://example.org/");
+  writer.configure("xslt-template", "http://localhost/rdfxml.xsl"); // FIXME
   writer.begin();
   writer.write_triple(triple);
   writer.finish();
@@ -38,6 +39,7 @@ BOOST_AUTO_TEST_CASE(test_write_quad) {
     rdf::uri_reference("http://example.org/")
   };
   rdf::writer writer(stdout, "application/xml", "UTF-8", "http://example.org/");
+  writer.configure("xslt-template", "http://localhost/rdfxml.xsl"); // FIXME
   writer.begin();
   writer.write_quad(quad);
   writer.finish();
@@ -51,6 +53,7 @@ BOOST_AUTO_TEST_CASE(test_write_quad_without_context) {
     rdf::plain_literal("Hello, world!", "en-US"),
   };
   rdf::writer writer(stdout, "application/xml", "UTF-8", "http://example.org/");
+  writer.configure("xslt-template", "http://localhost/rdfxml.xsl"); // FIXME
   writer.begin();
   writer.write_quad(quad);
   writer.finish();

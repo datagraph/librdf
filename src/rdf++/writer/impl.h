@@ -16,6 +16,10 @@ protected:
 public:
   virtual ~implementation() noexcept {}
 
+  virtual void configure(const char* key, const char* value) {
+    (void)key, (void)value;
+  }
+
   virtual void begin() {}
 
   virtual void finish() {}

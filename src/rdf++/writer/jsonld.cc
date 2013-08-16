@@ -15,6 +15,7 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
+    virtual void configure(const char* key, const char* value) override;
     virtual void begin() override;
     virtual void finish() override;
     virtual void write_triple(const rdf::triple& triple) override;
