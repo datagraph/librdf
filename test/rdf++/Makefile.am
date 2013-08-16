@@ -39,6 +39,10 @@ if !DISABLE_TURTLE
   check_PROGRAMS += check_writer_turtle
 endif
 
+if !DISABLE_XSLT
+  check_PROGRAMS += check_writer_xslt
+endif
+
 TESTS = $(check_PROGRAMS)
 
 AM_DEFAULT_SOURCE_EXT = .cc

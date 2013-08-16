@@ -53,6 +53,9 @@ static const format rdf_format_info[] = {
   /* JSON-LD (.jsonld) */
   {"application/ld+json",   nullptr, "jsonld", "jsonld", nullptr, nullptr},
 #endif
+#ifndef DISABLE_XSLT
+  {"application/xml",       nullptr, "xml",    "xslt",   nullptr,  nullptr},
+#endif
 #if 1
   /* Graphviz (.dot) */
   {"text/x-graphviz",       nullptr, "dot",    "raptor", nullptr, "dot"},

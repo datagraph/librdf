@@ -47,3 +47,7 @@ if !DISABLE_TRIX
   librdf___la_LIBADD += $(libxml2_LIBS)
   librdf___la_SOURCES += writer/trix.cc
 endif
+
+if !DISABLE_XSLT
+  librdf___la_SOURCES += writer/xslt.cc
+endif

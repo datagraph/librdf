@@ -19,6 +19,10 @@
 #include "rdf++/writer/trix.h"
 #endif
 
+#ifndef DISABLE_XSLT
+#include "rdf++/writer/xslt.h"
+#endif
+
 #include "rdf++/format.h"
 #include "rdf++/quad.h"
 #include "rdf++/raptor.h"
@@ -56,6 +60,12 @@ rdf_writer_for(FILE* stream,
 #ifndef DISABLE_TRIX
   if (std::strcmp("trix", format->module_name) == 0) {
     return rdf_writer_for_trix(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_XSLT
+  if (std::strcmp("xslt", format->module_name) == 0) {
+    return rdf_writer_for_xslt(stream, content_type, charset, base_uri);
   }
 #endif
 

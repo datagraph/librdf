@@ -81,6 +81,7 @@ AX_ARG_ENABLE_FORMAT([rdfxml], [RDF/XML]) # --enable-rdfxml/--disable-rdfxml
 AX_ARG_ENABLE_FORMAT([trig],   [TriG])    # --enable-trig/--disable-trig
 AX_ARG_ENABLE_FORMAT([trix],   [TriX])    # --enable-trix/--disable-trix
 AX_ARG_ENABLE_FORMAT([turtle], [Turtle])  # --enable-turtle/--disable-turtle
+AX_ARG_ENABLE_FORMAT([xslt],   [XSLT])    # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
@@ -92,7 +93,7 @@ AS_IF([test "x$enable_trix" != "xno"], [
   PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])
 ])
 # libxqilla (libxqilla-dev on Ubuntu, xqilla on Mac OS X + MacPorts)
-AS_IF([test "x$enable_rdfxml" != "xno"], [
+AS_IF([test "x$enable_xslt" != "xno"], [
   AC_CHECK_HEADERS([xqilla/xqilla-simple.hpp],
     AC_SEARCH_LIBS([createXQillaXQCImplementation], [xqilla], [],
       AC_MSG_ERROR([*** Shared library libxqilla not found; install http://xqilla.sourceforge.net/ ***])),

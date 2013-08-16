@@ -22,3 +22,4 @@ check_writer_rdfxml
 check_writer_trig
 check_writer_trix
 check_writer_turtle
+check_writer_xslt
