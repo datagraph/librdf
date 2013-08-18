@@ -12,6 +12,12 @@ check_format
 check_module
 check_quad
 check_reader
+check_reader_jsonld
+check_reader_nquads
+check_reader_rdfxml
+check_reader_trig
+check_reader_trix
+check_reader_turtle
 check_term
 check_triple
 check_version
