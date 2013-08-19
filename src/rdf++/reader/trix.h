@@ -5,4 +5,10 @@
 
 #include "rdf++/reader/impl.h"
 
+extern "C" rdf::reader::implementation* rdf_reader_for_trix(
+  FILE* stream,
+  const char* content_type,
+  const char* charset,
+  const char* base_uri);
+
 #endif /* RDFXX_READER_TRIX_H */

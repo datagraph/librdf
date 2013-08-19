@@ -14,40 +14,41 @@
 namespace rdf {
   struct triple;
   struct quad;
-
-  class reader : private boost::noncopyable {
-    public:
-      reader(
-        const std::string& file_path,
-        const std::string& content_type,
-        const std::string& charset,
-        const std::string& base_uri);
-
-      reader(
-        std::istream& stream,
-        const std::string& content_type,
-        const std::string& charset,
-        const std::string& base_uri);
-
-      reader(
-        FILE* stream,
-        const std::string& content_type,
-        const std::string& charset,
-        const std::string& base_uri);
-
-      ~reader();
-
-      void read_triples(std::function<void (rdf::triple*)> callback);
-
-      void read_quads(std::function<void (rdf::quad*)> callback);
-
-      void abort();
-
-    private:
-      class implementation;
-
-      std::unique_ptr<implementation> _implementation;
-  };
+  class reader;
 }
+
+class rdf::reader : private boost::noncopyable {
+public:
+  reader(
+    const std::string& file_path,
+    const std::string& content_type,
+    const std::string& charset,
+    const std::string& base_uri);
+
+  reader(
+    std::istream& stream,
+    const std::string& content_type,
+    const std::string& charset,
+    const std::string& base_uri);
+
+  reader(
+    FILE* stream,
+    const std::string& content_type,
+    const std::string& charset,
+    const std::string& base_uri);
+
+  ~reader();
+
+  void read_triples(std::function<void (rdf::triple*)> callback);
+
+  void read_quads(std::function<void (rdf::quad*)> callback);
+
+  void abort();
+
+  struct implementation;
+
+private:
+  std::unique_ptr<implementation> _implementation;
+};
 
 #endif /* RDFXX_READER_H */

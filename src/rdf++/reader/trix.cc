@@ -5,3 +5,25 @@
 #endif
 
 #include "rdf++/reader/trix.h"
+
+namespace {
+  struct implementation : public rdf::reader::implementation {
+    implementation(FILE* stream,
+      const char* content_type,
+      const char* charset,
+      const char* base_uri);
+    virtual ~implementation() noexcept override;
+    virtual void read_triples(std::function<void (rdf::triple*)> callback) override;
+    virtual void read_quads(std::function<void (rdf::quad*)> callback) override;
+    virtual void abort() override;
+  };
+}
+
+rdf::reader::implementation*
+rdf_reader_for_trix(FILE* const stream,
+                    const char* const content_type,
+                    const char* const charset,
+                    const char* const base_uri) {
+  (void)stream, (void)content_type, (void)charset, (void)base_uri;
+  return nullptr; // TODO
+}
