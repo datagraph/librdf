@@ -160,7 +160,7 @@ void
 implementation::read() {
   const int rc = raptor_parser_parse_iostream(_parser, _iostream, _base_uri);
   if (rc != 0) {
-    throw std::runtime_error("raptor_parser_parse_iostream() failed");
+    throw rdf::reader_error("raptor_parser_parse_iostream() failed");
   }
 }
 
