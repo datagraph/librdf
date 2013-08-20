@@ -170,6 +170,18 @@ namespace {
     }
 
     /**
+     * Retrieves the value of the attribute with the given qualified name.
+     *
+     * @note The returned string (if not `nullptr`) is owned by the caller.
+     */
+    char* get_attribute(const char* const attribute_name) const noexcept {
+      assert(attribute_name != nullptr);
+      /* @see http://xmlsoft.org/html/libxml-xmlreader.html#xmlTextReaderGetAttribute */
+      return string_or_nullptr(xmlTextReaderGetAttribute(_reader,
+        reinterpret_cast<const xmlChar*>(attribute_name)));
+    }
+
+    /**
      * Checks whether the current node has attributes.
      */
     bool has_attributes() const {
@@ -242,7 +254,7 @@ namespace {
      */
     char* read_string() const noexcept {
       /* @see http://xmlsoft.org/html/libxml-xmlreader.html#xmlTextReaderReadString */
-      return reinterpret_cast<char*>(xmlTextReaderReadString(_reader));
+      return string_or_nullptr(xmlTextReaderReadString(_reader));
     }
 
     /**
@@ -278,8 +290,17 @@ namespace {
       return value;
     }
 
+    inline char* string_or_nullptr(xmlChar* const value) const noexcept {
+      return reinterpret_cast<char*>(value);
+    }
+
     inline const char* string_or_nullptr(const xmlChar* const value) const noexcept {
       return reinterpret_cast<const char*>(value);
+    }
+
+    inline char* string_or_error(xmlChar* const value) const {
+      if (value == nullptr) throw_error();
+      return reinterpret_cast<char*>(value);
     }
 
     inline const char* string_or_error(const xmlChar* const value) const {
