@@ -7,6 +7,7 @@
 #include <functional> /* for std::function */
 #include <istream>    /* for std::istream */
 #include <memory>     /* for std::unique_ptr */
+#include <stdexcept>  /* for std::runtime_error */
 #include <string>     /* for std::string */
 
 #include <boost/noncopyable.hpp>
@@ -14,8 +15,15 @@
 namespace rdf {
   struct triple;
   struct quad;
+  class reader_error;
   class reader;
 }
+
+class rdf::reader_error : public std::runtime_error {
+public:
+  reader_error(const std::string& what) : std::runtime_error(what) {}
+  reader_error(const char* what) : std::runtime_error(what) {}
+};
 
 class rdf::reader : private boost::noncopyable {
 public:
