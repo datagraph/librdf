@@ -12,6 +12,7 @@
 
 #include "xml_reader.h"
 
+#include <memory>  /* for std::unique_ptr */
 #include <cstring> /* for std::strcmp() */
 
 namespace {
@@ -32,8 +33,8 @@ namespace {
     trix_state state = trix_state::start;
     trix_element element = trix_element::unknown;
     unsigned int term_pos = 0;
-    rdf::term* terms[3] = {nullptr, nullptr, nullptr};
-    rdf::term* graph = nullptr;
+    std::unique_ptr<rdf::term> terms[3] = {nullptr, nullptr, nullptr};
+    std::unique_ptr<rdf::term> graph = nullptr;
     std::function<void (rdf::triple*)> triple_callback = nullptr;
     std::function<void (rdf::quad*)> quad_callback = nullptr;
   };
@@ -157,10 +158,12 @@ implementation::read_with_context(trix_context& context) {
       case xml_node_type::element:
         begin_element(context);
         break;
+
       case xml_node_type::end_element:
         finish_element(context);
         break;
-      default:
+
+      default: /* ignored */
         break;
     }
   }
@@ -195,25 +198,33 @@ void
 implementation::leave_state(const trix_state state, trix_context& context) {
   switch (state) {
     case trix_state::graph:
-      delete context.graph;
-      context.graph = nullptr;
+      context.graph.reset();
       break;
 
     case trix_state::triple:
       if (context.quad_callback) {
-        auto quad = new rdf::quad(context.terms[0], context.terms[1], context.terms[2],
+        auto quad = new rdf::quad(
+          context.terms[0].get(),
+          context.terms[1].get(),
+          context.terms[2].get(),
           context.graph ? (context.graph)->clone() : nullptr);
         context.quad_callback(quad);
       }
       else if (context.triple_callback) {
-        auto triple = new rdf::triple(context.terms[0], context.terms[1], context.terms[2]);
+        auto triple = new rdf::triple(
+          context.terms[0].get(),
+          context.terms[1].get(),
+          context.terms[2].get());
         context.triple_callback(triple);
       }
       for (auto i = 0U; i < 3; i++) {
-        if (!context.quad_callback && !context.triple_callback) {
-          delete context.terms[i];
+        if (context.quad_callback || context.triple_callback) {
+          /* The callback took ownership of the terms: */
+          context.terms[i].release();
         }
-        context.terms[i] = nullptr;
+        else {
+          context.terms[i].reset();
+        }
       }
       context.term_pos = 0;
       break;
@@ -243,7 +254,7 @@ implementation::record_term(trix_context& context) {
     parse_error("record_term");
   }
 
-  context.terms[context.term_pos] = construct_term(context);
+  context.terms[context.term_pos].reset(construct_term(context));
   context.term_pos++;
 }
 
@@ -273,8 +284,8 @@ implementation::begin_element(trix_context& context) {
     case trix_element::uri:
       if (context.state == trix_state::graph) {
         ensure_depth(2);
-        assert(context.graph == nullptr); // FIXME
-        context.graph = construct_term(context);
+        //assert(context.graph.get() == nullptr); // FIXME
+        context.graph.reset(construct_term(context));
         break;
       }
       ensure_state(trix_state::triple, context);
