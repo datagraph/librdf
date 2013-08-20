@@ -79,33 +79,49 @@ implementation::implementation(FILE* const stream,
                                const char* const base_uri)
   : _reader(stream, base_uri, charset) {
   assert(stream != nullptr);
-  (void)content_type, (void)charset, (void)base_uri;
+  (void)content_type;
 }
 
 implementation::~implementation() noexcept = default;
 
 static trix_element
 intern_trix_element(const char* const element_name) {
-  if (std::strcmp(element_name, "TriX") == 0) {
-    return trix_element::TriX;
-  }
-  if (std::strcmp(element_name, "graph") == 0) {
-    return trix_element::graph;
-  }
-  if (std::strcmp(element_name, "triple") == 0) {
-    return trix_element::triple;
-  }
-  if (std::strcmp(element_name, "id") == 0) {
-    return trix_element::id;
-  }
-  if (std::strcmp(element_name, "uri") == 0) {
-    return trix_element::uri;
-  }
-  if (std::strcmp(element_name, "plainLiteral") == 0) {
-    return trix_element::plain_literal;
-  }
-  if (std::strcmp(element_name, "typedLiteral") == 0) {
-    return trix_element::typed_literal;
+  switch (*element_name) {
+    case 'T':
+      if (std::strcmp(element_name, "TriX") == 0) {
+        return trix_element::TriX;
+      }
+      break;
+    case 'g':
+      if (std::strcmp(element_name, "graph") == 0) {
+        return trix_element::graph;
+      }
+      break;
+    case 't':
+      if (std::strcmp(element_name, "triple") == 0) {
+        return trix_element::triple;
+      }
+      if (std::strcmp(element_name, "typedLiteral") == 0) {
+        return trix_element::typed_literal;
+      }
+      break;
+    case 'i':
+      if (std::strcmp(element_name, "id") == 0) {
+        return trix_element::id;
+      }
+      break;
+    case 'u':
+      if (std::strcmp(element_name, "uri") == 0) {
+        return trix_element::uri;
+      }
+      break;
+    case 'p':
+      if (std::strcmp(element_name, "plainLiteral") == 0) {
+        return trix_element::plain_literal;
+      }
+      break;
+    default:
+      break;
   }
   return trix_element::unknown;
 }
