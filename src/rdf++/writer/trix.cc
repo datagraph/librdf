@@ -175,6 +175,6 @@ implementation::write_term(const rdf::term& term_) {
     }
     case rdf::term_type::none:
     default:
-      assert(term.type != rdf::term_type::none);
+      assert(term_.type != rdf::term_type::none);
   }
 }
