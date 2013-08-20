@@ -3,6 +3,7 @@
 #ifndef RDFXX_READER_H
 #define RDFXX_READER_H
 
+#include <cstddef>    /* for std::size_t */
 #include <cstdio>     /* for FILE */
 #include <functional> /* for std::function */
 #include <istream>    /* for std::istream */
@@ -21,8 +22,24 @@ namespace rdf {
 
 class rdf::reader_error : public std::runtime_error {
 public:
-  reader_error(const std::string& what) : std::runtime_error(what) {}
-  reader_error(const char* what) : std::runtime_error(what) {}
+  reader_error(const char* what)
+    : std::runtime_error(what) {}
+
+  reader_error(const char* what, std::size_t line, std::size_t column = 0)
+    : std::runtime_error(what),
+      _line(line),
+      _column(column) {}
+
+  inline std::size_t line_number() const noexcept {
+    return _line;
+  }
+
+  inline std::size_t column_number() const noexcept {
+    return _column;
+  }
+
+protected:
+  std::size_t _line = 0, _column = 0;
 };
 
 class rdf::reader : private boost::noncopyable {
