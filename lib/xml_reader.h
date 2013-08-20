@@ -148,6 +148,22 @@ namespace {
     }
 
     /**
+     * Returns the line number of the current parsing point.
+     */
+    unsigned long line_number() const noexcept {
+      /* @see http://xmlsoft.org/html/libxml-xmlreader.html#xmlTextReaderGetParserLineNumber */
+      return xmlTextReaderGetParserLineNumber(_reader);
+    }
+
+    /**
+     * Returns the column number of the current parsing point.
+     */
+    unsigned long column_number() const noexcept {
+      /* @see http://xmlsoft.org/html/libxml-xmlreader.html#xmlTextReaderGetParserColumnNumber */
+      return xmlTextReaderGetParserColumnNumber(_reader);
+    }
+
+    /**
      * Retrieves all attributes of the current node.
      */
     std::map<std::string, std::string> attributes() {
