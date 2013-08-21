@@ -18,7 +18,7 @@
 namespace {
   enum class trix_element {
     unknown = 0,
-    TriX,
+    trix,
     graph,
     triple,
     id,
@@ -89,8 +89,9 @@ static trix_element
 intern_trix_element(const char* const element_name) {
   switch (*element_name) {
     case 'T':
-      if (std::strcmp(element_name, "TriX") == 0) {
-        return trix_element::TriX;
+      if (std::strcmp(element_name, "TriX") == 0 ||
+          std::strcmp(element_name, "trix") == 0) {
+        return trix_element::trix;
       }
       break;
     case 'g':
@@ -258,7 +259,7 @@ implementation::begin_element(trix_context& context) {
   context.element = intern_trix_element(_reader.name());
 
   switch (context.element) {
-    case trix_element::TriX:
+    case trix_element::trix:
       ensure_state(context, trix_state::start);
       ensure_depth(context, 0);
       change_state(context, trix_state::document);
@@ -308,7 +309,7 @@ implementation::finish_element(trix_context& context) {
   context.element = intern_trix_element(_reader.name());
 
   switch (context.element) {
-    case trix_element::TriX:
+    case trix_element::trix:
       assert_state(context, trix_state::document);
       change_state(context, trix_state::eof);
       break;
