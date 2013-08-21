@@ -34,7 +34,7 @@ namespace {
     trix_element element = trix_element::unknown;
     unsigned int term_pos = 0;
     std::unique_ptr<rdf::term> terms[3] = {nullptr, nullptr, nullptr};
-    std::unique_ptr<rdf::term> graph = nullptr;
+    std::unique_ptr<rdf::uri_reference> graph = nullptr;
     std::function<void (rdf::triple*)> triple_callback = nullptr;
     std::function<void (rdf::quad*)> quad_callback = nullptr;
   };
@@ -180,6 +180,10 @@ implementation::assert_state(trix_context& context, const trix_state state) {
 void
 implementation::enter_state(trix_context& context, const trix_state state) {
   switch (state) {
+    case trix_state::graph:
+      context.graph.reset();
+      break;
+
     case trix_state::triple:
       context.term_pos = 0;
       break;
@@ -192,10 +196,6 @@ implementation::enter_state(trix_context& context, const trix_state state) {
 void
 implementation::leave_state(trix_context& context, const trix_state state) {
   switch (state) {
-    case trix_state::graph:
-      context.graph.reset();
-      break;
-
     case trix_state::triple:
       if (context.quad_callback) {
         auto quad = new rdf::quad(
@@ -282,7 +282,7 @@ implementation::begin_element(trix_context& context) {
         if (context.graph) {
           throw_error(context, "repeated <uri> element inside <graph> element");
         }
-        context.graph.reset(construct_term(context));
+        context.graph.reset(new rdf::uri_reference(_reader.read_string()));
         break;
       }
       ensure_state(context, trix_state::triple);
