@@ -89,8 +89,7 @@ static trix_element
 intern_trix_element(const char* const element_name) {
   switch (*element_name) {
     case 'T':
-      if (std::strcmp(element_name, "TriX") == 0 ||
-          std::strcmp(element_name, "trix") == 0) {
+      if (std::strcmp(element_name, "TriX") == 0) {
         return trix_element::trix;
       }
       break;
@@ -99,7 +98,20 @@ intern_trix_element(const char* const element_name) {
         return trix_element::graph;
       }
       break;
+    case 'i':
+      if (std::strcmp(element_name, "id") == 0) {
+        return trix_element::id;
+      }
+      break;
+    case 'p':
+      if (std::strcmp(element_name, "plainLiteral") == 0) {
+        return trix_element::plain_literal;
+      }
+      break;
     case 't':
+      if (std::strcmp(element_name, "trix") == 0) {
+        return trix_element::trix;
+      }
       if (std::strcmp(element_name, "triple") == 0) {
         return trix_element::triple;
       }
@@ -107,19 +119,9 @@ intern_trix_element(const char* const element_name) {
         return trix_element::typed_literal;
       }
       break;
-    case 'i':
-      if (std::strcmp(element_name, "id") == 0) {
-        return trix_element::id;
-      }
-      break;
     case 'u':
       if (std::strcmp(element_name, "uri") == 0) {
         return trix_element::uri;
-      }
-      break;
-    case 'p':
-      if (std::strcmp(element_name, "plainLiteral") == 0) {
-        return trix_element::plain_literal;
       }
       break;
     default:
