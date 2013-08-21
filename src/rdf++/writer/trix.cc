@@ -105,8 +105,8 @@ implementation::write_triple(const rdf::triple& triple) {
 void
 implementation::write_quad(const rdf::quad& quad) {
   const bool context_changed = (!quad.context) ?
-    _context.string.empty() :
-    (_context.string.compare((*quad.context).string) == 0);
+    !_context.string.empty() :
+    (_context.string.compare((*quad.context).string) != 0);
 
   if (context_changed || !_count) {
     if (_count) {
