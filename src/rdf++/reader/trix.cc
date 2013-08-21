@@ -50,17 +50,17 @@ namespace {
     virtual void abort() override;
   protected:
     void read_with_context(trix_context& context);
-    void ensure_state(trix_state state, trix_context& context);
-    void assert_state(trix_state state, trix_context& context);
-    void enter_state(trix_state state, trix_context& context);
-    void leave_state(trix_state state, trix_context& context);
-    void change_state(trix_state state, trix_context& context);
-    void ensure_depth(unsigned int depth);
-    void ensure_depth(unsigned int depth_from, unsigned int depth_to);
+    void ensure_state(trix_context& context, trix_state state);
+    void assert_state(trix_context& context, trix_state state);
+    void enter_state(trix_context& context, trix_state state);
+    void leave_state(trix_context& context, trix_state state);
+    void change_state(trix_context& context, trix_state state);
+    void ensure_depth(trix_context& context, unsigned int depth);
     void record_term(trix_context& context);
     void begin_element(trix_context& context);
     void finish_element(trix_context& context);
     rdf::term* construct_term(trix_context& context);
+    void throw_error(trix_context& context, const char* what);
   private:
     xml_reader _reader;
   };
@@ -127,11 +127,6 @@ intern_trix_element(const char* const element_name) {
   return trix_element::unknown;
 }
 
-static void
-parse_error(const char* what = "TriX parse error") {
-  throw rdf::reader_error(what); // TODO
-}
-
 void
 implementation::read_triples(std::function<void (rdf::triple*)> callback) {
   trix_context context;
@@ -170,20 +165,20 @@ implementation::read_with_context(trix_context& context) {
 }
 
 void
-implementation::ensure_state(const trix_state state, trix_context& context) {
+implementation::ensure_state(trix_context& context, const trix_state state) {
   if (context.state != state) {
-    parse_error("ensure_state");
+    throw_error(context, "mismatched nesting of elements in TriX input");
   }
 }
 
 void
-implementation::assert_state(const trix_state state, trix_context& context) {
+implementation::assert_state(trix_context& context, const trix_state state) {
   (void)state, (void)context;
   assert(context.state == state);
 }
 
 void
-implementation::enter_state(const trix_state state, trix_context& context) {
+implementation::enter_state(trix_context& context, const trix_state state) {
   switch (state) {
     case trix_state::triple:
       context.term_pos = 0;
@@ -195,7 +190,7 @@ implementation::enter_state(const trix_state state, trix_context& context) {
 }
 
 void
-implementation::leave_state(const trix_state state, trix_context& context) {
+implementation::leave_state(trix_context& context, const trix_state state) {
   switch (state) {
     case trix_state::graph:
       context.graph.reset();
@@ -235,23 +230,23 @@ implementation::leave_state(const trix_state state, trix_context& context) {
 }
 
 void
-implementation::change_state(const trix_state state, trix_context& context) {
-  leave_state(context.state, context);
+implementation::change_state(trix_context& context, const trix_state state) {
+  leave_state(context, context.state);
   context.state = state;
-  enter_state(context.state, context);
+  enter_state(context, context.state);
 }
 
 void
-implementation::ensure_depth(const unsigned int depth) {
+implementation::ensure_depth(trix_context& context, const unsigned int depth) {
   if (_reader.depth() != depth) {
-    parse_error("ensure_depth");
+    throw_error(context, "incorrect nesting of elements in TriX input");
   }
 }
 
 void
 implementation::record_term(trix_context& context) {
   if (context.term_pos >= 3) {
-    parse_error("record_term");
+    throw_error(context, "too many elements inside <triple> element");
   }
 
   context.terms[context.term_pos].reset(construct_term(context));
@@ -264,45 +259,47 @@ implementation::begin_element(trix_context& context) {
 
   switch (context.element) {
     case trix_element::TriX:
-      ensure_state(trix_state::start, context);
-      ensure_depth(0);
-      change_state(trix_state::document, context);
+      ensure_state(context, trix_state::start);
+      ensure_depth(context, 0);
+      change_state(context, trix_state::document);
       break;
 
     case trix_element::graph:
-      ensure_state(trix_state::document, context);
-      ensure_depth(1);
-      change_state(trix_state::graph, context);
+      ensure_state(context, trix_state::document);
+      ensure_depth(context, 1);
+      change_state(context, trix_state::graph);
       break;
 
     case trix_element::triple:
-      ensure_state(trix_state::graph, context);
-      ensure_depth(2);
-      change_state(trix_state::triple, context);
+      ensure_state(context, trix_state::graph);
+      ensure_depth(context, 2);
+      change_state(context, trix_state::triple);
       break;
 
     case trix_element::uri:
       if (context.state == trix_state::graph) {
-        ensure_depth(2);
-        //assert(context.graph.get() == nullptr); // FIXME
+        ensure_depth(context, 2);
+        if (context.graph) {
+          throw_error(context, "repeated <uri> element inside <graph> element");
+        }
         context.graph.reset(construct_term(context));
         break;
       }
-      ensure_state(trix_state::triple, context);
-      ensure_depth(3);
+      ensure_state(context, trix_state::triple);
+      ensure_depth(context, 3);
       record_term(context);
       break;
 
     case trix_element::id:
     case trix_element::plain_literal:
     case trix_element::typed_literal:
-      ensure_state(trix_state::triple, context);
-      ensure_depth(3);
+      ensure_state(context, trix_state::triple);
+      ensure_depth(context, 3);
       record_term(context);
       break;
 
     default:
-      parse_error("begin_element"); // TODO
+      throw_error(context, "unknown XML element in TriX input");
   }
 }
 
@@ -312,32 +309,31 @@ implementation::finish_element(trix_context& context) {
 
   switch (context.element) {
     case trix_element::TriX:
-      assert_state(trix_state::document, context);
-      change_state(trix_state::eof, context);
+      assert_state(context, trix_state::document);
+      change_state(context, trix_state::eof);
       break;
 
     case trix_element::graph:
-      assert_state(trix_state::graph, context);
-      change_state(trix_state::document, context);
+      assert_state(context, trix_state::graph);
+      change_state(context, trix_state::document);
       break;
 
     case trix_element::triple:
-      assert_state(trix_state::triple, context);
-      change_state(trix_state::graph, context);
+      assert_state(context, trix_state::triple);
+      change_state(context, trix_state::graph);
       break;
 
     case trix_element::uri:
-      //assert_state(trix_state::triple, context); // FIXME
+      //assert_state(trix_state::triple, context); // FIXME: triple | graph
       break;
 
     case trix_element::id:
     case trix_element::plain_literal:
     case trix_element::typed_literal:
-      assert_state(trix_state::triple, context);
+      assert_state(context, trix_state::triple);
       break;
 
-    default:
-      parse_error("finish_element"); // TODO
+    default: abort(); /* never reached */
   }
 }
 
@@ -366,7 +362,7 @@ implementation::construct_term(trix_context& context) {
     case trix_element::typed_literal: {
       const auto datatype_uri = _reader.get_attribute("datatype");
       if (!datatype_uri) {
-        parse_error();
+        throw_error(context, "missing 'datatype' attribute for <typedLiteral> element");
       }
       term = new rdf::typed_literal(text, datatype_uri);
       break;
@@ -376,4 +372,11 @@ implementation::construct_term(trix_context& context) {
   }
 
   return term;
+}
+
+void
+implementation::throw_error(trix_context& context,
+                            const char* const what) {
+  (void)context;
+  throw rdf::reader_error(what, _reader.line_number(), _reader.column_number());
 }
