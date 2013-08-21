@@ -183,10 +183,6 @@ implementation::assert_state(trix_context& context, const trix_state state) {
 void
 implementation::enter_state(trix_context& context, const trix_state state) {
   switch (state) {
-    case trix_state::graph:
-      context.graph.reset();
-      break;
-
     case trix_state::triple:
       context.term_pos = 0;
       break;
@@ -271,6 +267,7 @@ implementation::begin_element(trix_context& context) {
       ensure_state(context, trix_state::document);
       ensure_depth(context, 1);
       change_state(context, trix_state::graph);
+      context.graph.reset();
       break;
 
     case trix_element::triple:
