@@ -53,6 +53,9 @@ namespace rdf {
       }
 
     protected:
+      term(const term_type type)
+        : type(type), string() {}
+
       term(const term_type type, const std::string& string)
         : type(type), string(string) {}
 
@@ -71,6 +74,9 @@ namespace rdf {
       }
 
     protected:
+      clonable_term(const term_type type)
+        : term(type) {}
+
       clonable_term(const term_type type, const std::string& string)
         : term(type, string) {}
 
@@ -95,6 +101,8 @@ namespace rdf {
    */
   struct blank_node : public clonable_term<blank_node> {
     public:
+      blank_node();
+
       blank_node(const std::string& node_label)
         : clonable_term<blank_node>(term_type::blank_node, node_label) {}
 
