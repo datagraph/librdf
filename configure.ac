@@ -123,6 +123,7 @@ AC_SUBST([TEST_CXXFLAGS])
 AC_SUBST([TEST_LDFLAGS])
 
 dnl Check for library functions:
+AC_CHECK_FUNCS_ONCE([fmemopen])
 
 dnl Check for system services:
 
