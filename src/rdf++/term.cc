@@ -6,21 +6,28 @@
 
 #include "rdf++/term.h"
 
-#include <atomic> /* for std::atomic */
+#include <chrono>  /* for std::chrono */
+#include <cstring> /* for std::sprintf() */
+#include <random>  /* for std::random_device */
 
 using namespace rdf;
 
 extern const term* const rdf::default_context = nullptr;
 
-static std::atomic_size_t blank_node_id = {0};
+static std::random_device random_uint;
 
 blank_node::blank_node()
   : clonable_term<blank_node>(term_type::blank_node) {
 
-  blank_node_id++;
+  using clock = std::chrono::steady_clock; /* a monotonic clock */
+  using precision = std::chrono::microseconds;
+  using std::chrono::duration_cast;
+
+  const auto prefix = duration_cast<precision>(clock::now().time_since_epoch()).count();
+  const auto suffix = random_uint();
 
   char buffer[32];
-  sprintf(buffer, "g%zu", blank_node_id.load());
+  std::sprintf(buffer, "g%016zu%03u", prefix, suffix % 1000);
 
   string.assign(buffer);
 }
