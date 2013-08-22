@@ -66,8 +66,8 @@ implementation::begin() {
   /* <?xml version="1.0" encoding="UTF-8"?> */
   _xml.begin_document();
 
-  /* <TriX xmlns="http://www.w3.org/2004/03/trix/trix-1/"> */
-  _xml.begin_element_with_ns("TriX", "http://www.w3.org/2004/03/trix/trix-1/");
+  /* <trix xmlns="http://www.w3.org/2004/03/trix/trix-1/"> */
+  _xml.begin_element_with_ns("trix", "http://www.w3.org/2004/03/trix/trix-1/");
 }
 
 void
@@ -76,7 +76,7 @@ implementation::finish() {
     _xml.finish_element(); /* </graph> */
   }
 
-  _xml.finish_element(); /* </TriX> */
+  _xml.finish_element(); /* </trix> */
 
   _xml.finish_document(); /* EOF */
 }
