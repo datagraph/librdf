@@ -13,6 +13,8 @@
 #include "rdf++/triple.h"
 
 #include <cassert>    /* for assert() */
+#include <cstdlib>    /* for std::malloc() */
+#include <cstring>    /* for std::memcpy() */
 #include <functional> /* for std::function */
 #include <iostream>   /* for std::cerr, std::endl */
 #include <new>        /* for std::bad_alloc */
@@ -34,6 +36,7 @@ namespace {
   public:
     void read();
     static void statement_callback(void* user_data, raptor_statement* statement);
+    static unsigned char* bnodeid_callback(void* user_data, unsigned char* user_bnodeid);
     static void log_callback(void* user_data, raptor_log_message* message);
 
   private:
@@ -76,6 +79,7 @@ implementation::implementation(FILE* const stream,
     throw std::bad_alloc(); /* out of memory */
   }
   raptor_world_set_log_handler(_world, this, implementation::log_callback);
+  raptor_world_set_generate_bnodeid_handler(_world, this, implementation::bnodeid_callback);
   raptor_world_open(_world);
 
   _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri);
@@ -220,6 +224,9 @@ copy_raptor_term(const rdf::term_position pos,
   return term;
 }
 
+/**
+ * @see http://librdf.org/raptor/api/raptor2-section-general.html#raptor-statement-handler
+ */
 void
 implementation::statement_callback(void* const user_data,
                                    raptor_statement* const statement) {
@@ -249,6 +256,26 @@ implementation::statement_callback(void* const user_data,
 }
 
 /**
+ * @see http://librdf.org/raptor/api/raptor2-section-world.html#raptor-world-set-generate-bnodeid-handler
+ */
+unsigned char*
+implementation::bnodeid_callback(void* const user_data,
+                                 unsigned char* const user_bnodeid) {
+  (void)user_data; /* not used */
+
+  if (user_bnodeid) {
+    return user_bnodeid;
+  }
+
+  rdf::blank_node bnode; /* generates a new unique label */
+
+  unsigned char* const result = reinterpret_cast<unsigned char*>(std::malloc(bnode.string.size() + 1));
+  std::memcpy(result, bnode.string.c_str(), bnode.string.size() + 1); /* include NUL */
+
+  return result;
+}
+
+/**
  * @see http://librdf.org/raptor/api/raptor2-section-general.html#raptor-log-handler
  */
 void
@@ -258,8 +285,12 @@ implementation::log_callback(void* const user_data,
   //assert(reader_impl != nullptr);
   assert(message != nullptr);
 
-#if 1
-  fprintf(stderr, "rdf::reader::implementation::log_callback(%p, %p): message=%s locator=%d:%d\n",
-    user_data, message, message->text, message->locator->line, message->locator->column);
-#endif
+  if (message->locator) {
+    fprintf(stderr, "rdf::reader::implementation::log_callback(%p, %p): message=%s locator=%d:%d\n",
+      user_data, message, message->text, message->locator->line, message->locator->column);
+  }
+  else {
+    fprintf(stderr, "rdf::reader::implementation::log_callback(%p, %p): message=%s\n",
+      user_data, message, message->text);
+  }
 }
