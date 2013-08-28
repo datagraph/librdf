@@ -8,21 +8,35 @@
 #include "rdf++/term.h"
 
 namespace rdf {
-  struct quad {
-    public:
-      std::unique_ptr<term> subject;
-      std::unique_ptr<term> predicate;
-      std::unique_ptr<term> object;
-      std::unique_ptr<term> context;
-
-      quad(term* subject, term* predicate, term* object, term* context = nullptr);
-
-      quad(const term* subject, const term* predicate, const term* object, const term* context = nullptr);
-
-      quad(const term& subject, const term& predicate, const term& object);
-
-      quad(const term& subject, const term& predicate, const term& object, const term& context);
-  };
+  struct quad;
 }
+
+struct rdf::quad {
+  std::unique_ptr<term> subject;
+  std::unique_ptr<term> predicate;
+  std::unique_ptr<term> object;
+  std::unique_ptr<term> context;
+
+public:
+  /**
+   * Constructor.
+   */
+  quad(term* subject, term* predicate, term* object, term* context = nullptr);
+
+  /**
+   * Constructor.
+   */
+  quad(const term* subject, const term* predicate, const term* object, const term* context = nullptr);
+
+  /**
+   * Constructor.
+   */
+  quad(const term& subject, const term& predicate, const term& object);
+
+  /**
+   * Constructor.
+   */
+  quad(const term& subject, const term& predicate, const term& object, const term& context);
+};
 
 #endif /* RDFXX_QUAD_H */

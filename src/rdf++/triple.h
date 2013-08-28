@@ -8,18 +8,29 @@
 #include "rdf++/term.h"
 
 namespace rdf {
-  struct triple {
-    public:
-      std::unique_ptr<term> subject;
-      std::unique_ptr<term> predicate;
-      std::unique_ptr<term> object;
-
-      triple(term* subject, term* predicate, term* object);
-
-      triple(const term* subject, const term* predicate, const term* object);
-
-      triple(const term& subject, const term& predicate, const term& object);
-  };
+  struct triple;
 }
+
+struct rdf::triple {
+  std::unique_ptr<term> subject;
+  std::unique_ptr<term> predicate;
+  std::unique_ptr<term> object;
+
+public:
+  /**
+   * Constructor.
+   */
+  triple(term* subject, term* predicate, term* object);
+
+  /**
+   * Constructor.
+   */
+  triple(const term* subject, const term* predicate, const term* object);
+
+  /**
+   * Constructor.
+   */
+  triple(const term& subject, const term& predicate, const term& object);
+};
 
 #endif /* RDFXX_TRIPLE_H */
