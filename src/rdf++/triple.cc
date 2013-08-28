@@ -4,15 +4,21 @@
 #include <config.h>
 #endif
 
+#include "rdf++/term.h"
 #include "rdf++/triple.h"
 
 #include <cassert> /* for assert() */
 
 using namespace rdf;
 
+triple::triple() noexcept
+  : subject(nullptr),
+    predicate(nullptr),
+    object(nullptr) {}
+
 triple::triple(term* const subject,
                term* const predicate,
-               term* const object)
+               term* const object) noexcept
   : subject(subject),
     predicate(predicate),
     object(object) {
@@ -25,14 +31,9 @@ triple::triple(term* const subject,
 triple::triple(const term* const subject,
                const term* const predicate,
                const term* const object)
-  : subject(subject != nullptr ? subject->clone() : nullptr),
-    predicate(predicate != nullptr ? predicate->clone() : nullptr),
-    object(object != nullptr ? object->clone() : nullptr) {
-
-  assert(subject != nullptr);
-  assert(predicate != nullptr);
-  assert(object != nullptr);
-}
+  : subject(subject ? subject->clone() : nullptr),
+    predicate(predicate ? predicate->clone() : nullptr),
+    object(object ? object->clone() : nullptr) {}
 
 triple::triple(const term& subject,
                const term& predicate,
@@ -40,3 +41,5 @@ triple::triple(const term& subject,
   : subject(subject.clone()),
     predicate(predicate.clone()),
     object(object.clone()) {}
+
+triple::~triple() noexcept = default;

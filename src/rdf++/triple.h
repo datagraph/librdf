@@ -5,9 +5,8 @@
 
 #include <memory> /* for std::unique_ptr */
 
-#include "rdf++/term.h"
-
 namespace rdf {
+  struct term;
   struct triple;
 }
 
@@ -18,9 +17,14 @@ struct rdf::triple {
 
 public:
   /**
+   * Default constructor.
+   */
+  triple() noexcept;
+
+  /**
    * Constructor.
    */
-  triple(term* subject, term* predicate, term* object);
+  triple(term* subject, term* predicate, term* object) noexcept;
 
   /**
    * Constructor.
@@ -31,6 +35,11 @@ public:
    * Constructor.
    */
   triple(const term& subject, const term& predicate, const term& object);
+
+  /**
+   * Destructor.
+   */
+  ~triple() noexcept;
 };
 
 #endif /* RDFXX_TRIPLE_H */
