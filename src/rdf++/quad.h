@@ -5,10 +5,9 @@
 
 #include <memory> /* for std::unique_ptr */
 
-#include "rdf++/term.h"
-
 namespace rdf {
   struct quad;
+  struct term;
 }
 
 struct rdf::quad {
@@ -19,9 +18,14 @@ struct rdf::quad {
 
 public:
   /**
+   * Default constructor.
+   */
+  quad() noexcept;
+
+  /**
    * Constructor.
    */
-  quad(term* subject, term* predicate, term* object, term* context = nullptr);
+  quad(term* subject, term* predicate, term* object, term* context = nullptr) noexcept;
 
   /**
    * Constructor.
@@ -37,6 +41,11 @@ public:
    * Constructor.
    */
   quad(const term& subject, const term& predicate, const term& object, const term& context);
+
+  /**
+   * Destructor.
+   */
+  ~quad() noexcept;
 };
 
 #endif /* RDFXX_QUAD_H */

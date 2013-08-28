@@ -5,15 +5,22 @@
 #endif
 
 #include "rdf++/quad.h"
+#include "rdf++/term.h"
 
 #include <cassert> /* for assert() */
 
 using namespace rdf;
 
+quad::quad() noexcept
+  : subject(nullptr),
+    predicate(nullptr),
+    object(nullptr),
+    context(nullptr) {}
+
 quad::quad(term* const subject,
            term* const predicate,
            term* const object,
-           term* const context)
+           term* const context) noexcept
   : subject(subject),
     predicate(predicate),
     object(object),
@@ -29,16 +36,10 @@ quad::quad(const term* const subject,
            const term* const predicate,
            const term* const object,
            const term* const context)
-  : subject(subject != nullptr ? subject->clone() : nullptr),
-    predicate(predicate != nullptr ? predicate->clone() : nullptr),
-    object(object != nullptr ? object->clone() : nullptr),
-    context(context != nullptr ? context->clone() : nullptr) {
-
-  assert(subject != nullptr);
-  assert(predicate != nullptr);
-  assert(object != nullptr);
-  /* context can be nullptr to designate the default context */
-}
+  : subject(subject ? subject->clone() : nullptr),
+    predicate(predicate ? predicate->clone() : nullptr),
+    object(object ? object->clone() : nullptr),
+    context(context ? context->clone() : nullptr) {}
 
 quad::quad(const term& subject,
            const term& predicate,
@@ -56,3 +57,5 @@ quad::quad(const term& subject,
     predicate(predicate.clone()),
     object(object.clone()),
     context(context.clone()) {}
+
+quad::~quad() noexcept = default;
