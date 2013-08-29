@@ -44,20 +44,19 @@ protected:
 
 class rdf::reader : private boost::noncopyable {
 public:
-  reader(
-    const std::string& file_path,
+  reader(const std::string& file_path,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);
 
-  reader(
-    std::istream& stream,
+  reader(std::istream& stream,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);
 
-  reader(
-    FILE* stream,
+  reader(FILE* stream);
+
+  reader(FILE* stream,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);

@@ -34,9 +34,16 @@ using namespace rdf;
 
 static rdf::reader::implementation*
 rdf_reader_for(FILE* stream,
-               const char* const content_type,
-               const char* const charset,
-               const char* const base_uri) {
+               const char* const content_type = nullptr,
+               const char* const charset = nullptr,
+               const char* const base_uri = nullptr) {
+#ifndef DISABLE_RAPTOR
+  /* Only the Raptor implementation supports content autodetection at the moment: */
+  if (!content_type) {
+    return rdf_reader_for_raptor(stream, content_type, charset, base_uri);
+  }
+#endif
+
   const format* const format = format::find_for_content_type(content_type);
   if (format == nullptr) {
     return nullptr; /* unknown content type */
@@ -78,6 +85,13 @@ reader::reader(std::istream& stream,
                const std::string& base_uri)
   : _implementation(nullptr) {
   (void)stream, (void)content_type, (void)charset, (void)base_uri; // TODO
+}
+
+reader::reader(FILE* const stream)
+  : _implementation(rdf_reader_for(stream)) {
+  if (!_implementation) {
+    throw std::invalid_argument("unable to guess the input content type");
+  }
 }
 
 reader::reader(FILE* const stream,
