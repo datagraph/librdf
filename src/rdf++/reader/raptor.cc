@@ -66,11 +66,13 @@ implementation::implementation(FILE* const stream,
 
   assert(stream != nullptr);
 
-  const rdf::format* const format = rdf::format::find_for_content_type(content_type);
-  assert(format != nullptr);
-
-  const char* const parser_name = format->parser_name;
-  assert(parser_name != nullptr);
+  const char* parser_name = "guess";
+  if (content_type) {
+    const rdf::format* const format = rdf::format::find_for_content_type(content_type);
+    assert(format != nullptr);
+    parser_name = format->parser_name;
+    assert(parser_name != nullptr);
+  }
 
   _world = raptor_new_world();
   if (_world == nullptr) {
