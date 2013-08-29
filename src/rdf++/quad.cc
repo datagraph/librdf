@@ -59,3 +59,11 @@ quad::quad(const term& subject,
     context(context.clone()) {}
 
 quad::~quad() noexcept = default;
+
+void
+quad::reset() noexcept {
+  subject.release();
+  predicate.release();
+  object.release();
+  context.release();
+}
