@@ -82,15 +82,17 @@ implementation::implementation(FILE* const stream,
   raptor_world_set_generate_bnodeid_handler(_world, this, implementation::bnodeid_callback);
   raptor_world_open(_world);
 
-  _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri);
-  if (_base_uri == nullptr) {
-    raptor_free_world(_world), _world = nullptr;
-    throw std::bad_alloc(); /* out of memory */
+  if (base_uri) {
+    _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri);
+    if (_base_uri == nullptr) {
+      raptor_free_world(_world), _world = nullptr;
+      throw std::bad_alloc(); /* out of memory */
+    }
   }
 
   _iostream = raptor_new_iostream_from_file_handle(_world, stream);
   if (_iostream == nullptr) {
-    raptor_free_uri(_base_uri), _base_uri = nullptr;
+    if (_base_uri) raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
@@ -98,7 +100,7 @@ implementation::implementation(FILE* const stream,
   _parser = raptor_new_parser(_world, parser_name);
   if (_parser == nullptr) {
     raptor_free_iostream(_iostream), _iostream = nullptr;
-    raptor_free_uri(_base_uri), _base_uri = nullptr;
+    if (_base_uri) raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
@@ -108,7 +110,7 @@ implementation::implementation(FILE* const stream,
   if (_statement == nullptr) {
     raptor_free_parser(_parser), _parser = nullptr;
     raptor_free_iostream(_iostream), _iostream = nullptr;
-    raptor_free_uri(_base_uri), _base_uri = nullptr;
+    if (_base_uri) raptor_free_uri(_base_uri), _base_uri = nullptr;
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
   }
