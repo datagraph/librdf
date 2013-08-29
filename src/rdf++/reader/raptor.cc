@@ -29,8 +29,8 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
-    virtual void read_triples(std::function<void (rdf::triple*)> callback) override;
-    virtual void read_quads(std::function<void (rdf::quad*)> callback) override;
+    virtual void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) override;
+    virtual void read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) override;
     virtual void abort() override;
 
   public:
@@ -45,8 +45,8 @@ namespace {
     raptor_iostream* _iostream = nullptr;
     raptor_parser* _parser = nullptr;
     raptor_statement* _statement = nullptr;
-    std::function<void (rdf::triple*)> _triple_callback;
-    std::function<void (rdf::quad*)> _quad_callback;
+    std::function<void (std::unique_ptr<rdf::triple>)> _triple_callback;
+    std::function<void (std::unique_ptr<rdf::quad>)> _quad_callback;
   };
 }
 
@@ -144,14 +144,14 @@ implementation::~implementation() noexcept {
 }
 
 void
-implementation::read_triples(std::function<void (rdf::triple*)> callback) {
+implementation::read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) {
   _triple_callback = callback;
   _quad_callback   = nullptr;
   read();
 }
 
 void
-implementation::read_quads(std::function<void (rdf::quad*)> callback) {
+implementation::read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) {
   _triple_callback = nullptr;
   _quad_callback   = callback;
   read();
@@ -248,12 +248,12 @@ implementation::statement_callback(void* const user_data,
     rdf::term* const context = copy_raptor_term(rdf::term_position::context, statement->graph);
     rdf::quad* const quad = new rdf::quad(subject, predicate, object, context);
 
-    reader_impl->_quad_callback(quad);
+    reader_impl->_quad_callback(std::unique_ptr<rdf::quad>(quad));
   }
   else if (reader_impl->_triple_callback) {
     rdf::triple* const triple = new rdf::triple(subject, predicate, object);
 
-    reader_impl->_triple_callback(triple);
+    reader_impl->_triple_callback(std::unique_ptr<rdf::triple>(triple));
   }
 }
 

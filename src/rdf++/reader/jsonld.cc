@@ -15,8 +15,8 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
-    virtual void read_triples(std::function<void (rdf::triple*)> callback) override;
-    virtual void read_quads(std::function<void (rdf::quad*)> callback) override;
+    virtual void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) override;
+    virtual void read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) override;
     virtual void abort() override;
   };
 }

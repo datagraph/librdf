@@ -35,8 +35,8 @@ namespace {
     unsigned int term_pos = 0;
     std::unique_ptr<rdf::term> terms[3] = {nullptr, nullptr, nullptr};
     std::unique_ptr<rdf::uri_reference> graph = nullptr;
-    std::function<void (rdf::triple*)> triple_callback = nullptr;
-    std::function<void (rdf::quad*)> quad_callback = nullptr;
+    std::function<void (std::unique_ptr<rdf::triple>)> triple_callback = nullptr;
+    std::function<void (std::unique_ptr<rdf::quad>)> quad_callback = nullptr;
   };
 
   struct implementation : public rdf::reader::implementation {
@@ -45,8 +45,8 @@ namespace {
       const char* charset,
       const char* base_uri);
     virtual ~implementation() noexcept override;
-    virtual void read_triples(std::function<void (rdf::triple*)> callback) override;
-    virtual void read_quads(std::function<void (rdf::quad*)> callback) override;
+    virtual void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) override;
+    virtual void read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) override;
     virtual void abort() override;
   protected:
     void read_with_context(trix_context& context);
@@ -131,14 +131,14 @@ intern_trix_element(const char* const element_name) {
 }
 
 void
-implementation::read_triples(std::function<void (rdf::triple*)> callback) {
+implementation::read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) {
   trix_context context;
   context.triple_callback = callback;
   read_with_context(context);
 }
 
 void
-implementation::read_quads(std::function<void (rdf::quad*)> callback) {
+implementation::read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) {
   trix_context context;
   context.quad_callback = callback;
   read_with_context(context);
@@ -202,14 +202,14 @@ implementation::leave_state(trix_context& context, const trix_state state) {
           context.terms[1].get(),
           context.terms[2].get(),
           context.graph ? (context.graph)->clone() : nullptr);
-        context.quad_callback(quad);
+        context.quad_callback(std::unique_ptr<rdf::quad>(quad));
       }
       else if (context.triple_callback) {
         auto triple = new rdf::triple(
           context.terms[0].get(),
           context.terms[1].get(),
           context.terms[2].get());
-        context.triple_callback(triple);
+        context.triple_callback(std::unique_ptr<rdf::triple>(triple));
       }
       for (auto i = 0U; i < 3; i++) {
         if (context.quad_callback || context.triple_callback) {

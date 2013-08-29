@@ -32,9 +32,8 @@ BOOST_AUTO_TEST_CASE(test_ctor) {
 BOOST_AUTO_TEST_CASE(test_read_triples) {
   std::istringstream stream(input);
   rdf::reader reader(stream, "text/x-nquads", "UTF-8", "http://example.org/");
-  reader.read_triples([](rdf::triple* triple) {
+  reader.read_triples([](std::unique_ptr<rdf::triple> triple) {
     std::cout << "test_read_triple\n";
-    delete triple;
   });
   BOOST_CHECK(true); // TODO
 }
@@ -44,9 +43,8 @@ BOOST_AUTO_TEST_CASE(test_read_triples) {
 BOOST_AUTO_TEST_CASE(test_read_quads) {
   std::istringstream stream(input);
   rdf::reader reader(stream, "text/x-nquads", "UTF-8", "http://example.org/");
-  reader.read_quads([](rdf::quad* quad) {
+  reader.read_quads([](std::unique_ptr<rdf::quad> quad) {
     std::cout << "test_read_quad\n";
-    delete quad;
   });
   BOOST_CHECK(true); // TODO
 }

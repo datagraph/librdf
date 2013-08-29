@@ -107,13 +107,13 @@ reader::reader(FILE* const stream,
 reader::~reader() = default;
 
 void
-reader::read_triples(std::function<void (rdf::triple*)> callback) {
+reader::read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) {
   assert(_implementation != nullptr);
   _implementation->read_triples(callback);
 }
 
 void
-reader::read_quads(std::function<void (rdf::quad*)> callback) {
+reader::read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) {
   assert(_implementation != nullptr);
   _implementation->read_quads(callback);
 }

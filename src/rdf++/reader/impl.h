@@ -17,9 +17,9 @@ protected:
 public:
   virtual ~implementation() noexcept {}
 
-  virtual void read_triples(std::function<void (rdf::triple*)> callback) = 0;
+  virtual void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) = 0;
 
-  virtual void read_quads(std::function<void (rdf::quad*)> callback) = 0;
+  virtual void read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) = 0;
 
   virtual void abort() = 0;
 
