@@ -40,6 +40,11 @@ public:
    * Destructor.
    */
   ~triple() noexcept;
+
+  /**
+   * Sets all terms to `nullptr`.
+   */
+  void reset() noexcept;
 };
 
 #endif /* RDFXX_TRIPLE_H */

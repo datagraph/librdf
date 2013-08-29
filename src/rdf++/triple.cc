@@ -43,3 +43,10 @@ triple::triple(const term& subject,
     object(object.clone()) {}
 
 triple::~triple() noexcept = default;
+
+void
+triple::reset() noexcept {
+  subject.release();
+  predicate.release();
+  object.release();
+}
