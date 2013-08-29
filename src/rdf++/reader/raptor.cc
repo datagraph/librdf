@@ -40,8 +40,6 @@ namespace {
     static void log_callback(void* user_data, raptor_log_message* message);
 
   private:
-    const std::string _content_type;
-    const std::string _charset;
     raptor_world* _world = nullptr;
     raptor_uri* _base_uri = nullptr;
     raptor_iostream* _iostream = nullptr;
@@ -63,12 +61,12 @@ rdf_reader_for_raptor(FILE* const stream,
 implementation::implementation(FILE* const stream,
                                const char* const content_type,
                                const char* const charset,
-                               const char* const base_uri)
-  : _content_type(content_type),
-    _charset(charset) {
+                               const char* const base_uri) {
+  (void)charset; /* not used */
+
   assert(stream != nullptr);
 
-  const rdf::format* const format = rdf::format::find_for_content_type(_content_type);
+  const rdf::format* const format = rdf::format::find_for_content_type(content_type);
   assert(format != nullptr);
 
   const char* const parser_name = format->parser_name;
