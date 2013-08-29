@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#include <raptor2/raptor2.h> /* for raptor_*() */
+#include <raptor2.h> /* for raptor_*() */
 
 raptor_iostream* raptor_new_iostream_from_std_istream(
   raptor_world* world,

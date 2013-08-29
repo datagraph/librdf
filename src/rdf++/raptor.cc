@@ -14,7 +14,7 @@
 #include <cstdio>  /* for debugging */
 #endif
 
-#include <raptor2/raptor2.h> /* for raptor_*() */
+#include <raptor2.h> /* for raptor_*() */
 
 /**
  * @see http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-write-byte-func

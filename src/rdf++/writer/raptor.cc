@@ -17,7 +17,7 @@
 #include <new>        /* for std::bad_alloc */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 
-#include <raptor2/raptor2.h> /* for raptor_*() */
+#include <raptor2.h>  /* for raptor_*() */
 
 namespace {
   struct implementation : public rdf::writer::implementation {
