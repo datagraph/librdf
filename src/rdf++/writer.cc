@@ -30,13 +30,14 @@
 #include "rdf++/triple.h"
 
 #include <cassert>   /* for assert() */
+#include <cstdlib>   /* for std::abort() */
 #include <cstring>   /* for std::strcmp() */
 #include <stdexcept> /* for std::invalid_argument, std::runtime_error */
 
 using namespace rdf;
 
 static rdf::writer::implementation*
-rdf_writer_for(FILE* stream,
+rdf_writer_for(FILE* const stream,
                const char* const content_type,
                const char* const charset,
                const char* const base_uri) {
@@ -44,6 +45,7 @@ rdf_writer_for(FILE* stream,
   if (format == nullptr) {
     return nullptr; /* unknown content type */
   }
+  assert(format->module_name != nullptr);
 
 #ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
@@ -70,7 +72,7 @@ rdf_writer_for(FILE* stream,
 #endif
 
   (void)stream, (void)charset, (void)base_uri;
-  return nullptr; /* no implementation available */
+  return std::abort(), nullptr; /* never reached */
 }
 
 writer::writer(const std::string& file_path,
