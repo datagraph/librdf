@@ -42,7 +42,7 @@ static const format rdf_format_info[] = {
 #endif
 #ifndef DISABLE_RDFXML
   /* RDF/XML (.rdf) */
-#if 1
+#if 0
   {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml",},
 #else
   {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml-abbrev",},
