@@ -45,6 +45,9 @@ namespace rdf {
         configure(key.c_str(), value.c_str());
       }
 
+      /**
+       * @throws std::invalid_argument if `key` is `nullptr` or an empty string
+       */
       void configure(const char* key, const char* value);
 
       void define_prefix(const std::string& prefix,
