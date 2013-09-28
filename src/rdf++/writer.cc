@@ -4,30 +4,30 @@
 #include <config.h>
 #endif
 
-#include "rdf++/writer.h"
-#include "rdf++/writer/impl.h"
+#include "writer.h"
+#include "writer/impl.h"
 
 #ifndef DISABLE_JSONLD
-#include "rdf++/writer/jsonld.h"
+#include "writer/jsonld.h"
 #endif
 
 #ifndef DISABLE_RAPTOR
-#include "rdf++/writer/raptor.h"
+#include "writer/raptor.h"
 #endif
 
 #ifndef DISABLE_TRIX
-#include "rdf++/writer/trix.h"
+#include "writer/trix.h"
 #endif
 
 #ifndef DISABLE_XSLT
-#include "rdf++/writer/xslt.h"
+#include "writer/xslt.h"
 #endif
 
-#include "rdf++/format.h"
-#include "rdf++/quad.h"
-#include "rdf++/raptor.h"
-#include "rdf++/term.h"
-#include "rdf++/triple.h"
+#include "format.h"
+#include "quad.h"
+#include "raptor.h"
+#include "term.h"
+#include "triple.h"
 
 #include <cassert>   /* for assert() */
 #include <cstdlib>   /* for std::abort() */
