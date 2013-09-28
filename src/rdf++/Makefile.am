@@ -2,7 +2,8 @@ AM_CPPFLAGS += $(libraptor2_CFLAGS)
 
 lib_LTLIBRARIES = librdf++.la
 
-librdf___la_LIBADD = $(libraptor2_LIBS)
+librdf___la_LIBADD = $(top_srcdir)/lib/librfcjson.la
+librdf___la_LIBADD += $(libraptor2_LIBS)
 
 librdf___la_SOURCES =     \
   extern.cc               \
