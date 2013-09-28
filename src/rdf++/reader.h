@@ -11,8 +11,6 @@
 #include <stdexcept>  /* for std::runtime_error */
 #include <string>     /* for std::string */
 
-#include <boost/noncopyable.hpp>
-
 namespace rdf {
   struct triple;
   struct quad;
@@ -20,6 +18,9 @@ namespace rdf {
   class reader;
 }
 
+/**
+ * RDF parser error.
+ */
 class rdf::reader_error : public std::runtime_error {
 public:
   reader_error(const char* what)
@@ -42,26 +43,71 @@ protected:
   std::size_t _line = 0, _column = 0;
 };
 
-class rdf::reader : private boost::noncopyable {
+/**
+ * RDF parser.
+ *
+ * @note Instances of this class are movable, but not copyable.
+ */
+class rdf::reader {
 public:
+  /**
+   * Default constructor.
+   */
+  reader() noexcept = delete;
+
+  /**
+   * Constructor.
+   */
   reader(const std::string& file_path,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);
 
+  /**
+   * Constructor.
+   */
   reader(std::istream& stream,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);
 
+  /**
+   * Constructor.
+   */
   reader(FILE* stream);
 
+  /**
+   * Constructor.
+   */
   reader(FILE* stream,
     const std::string& content_type,
     const std::string& charset,
     const std::string& base_uri);
 
-  ~reader();
+  /**
+   * Copy constructor.
+   */
+  reader(const reader& other) noexcept = delete;
+
+  /**
+   * Move constructor.
+   */
+  reader(reader&& other) noexcept;
+
+  /**
+   * Destructor.
+   */
+  ~reader() noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  reader& operator=(const reader& other) noexcept = delete;
+
+  /**
+   * Move assignment operator.
+   */
+  reader& operator=(reader&& other) noexcept;
 
   void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback);
 
