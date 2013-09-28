@@ -20,9 +20,16 @@ namespace rdf {
 
 /**
  * RDF serializer.
+ *
+ * @note Instances of this class are movable, but not copyable.
  */
 class rdf::writer {
 public:
+  /**
+   * Default constructor.
+   */
+  writer() noexcept = delete;
+
   /**
    * Constructor.
    */
@@ -51,9 +58,29 @@ public:
     const std::string& base_uri);
 
   /**
+   * Copy constructor.
+   */
+  writer(const writer& other) noexcept = delete;
+
+  /**
+   * Move constructor.
+   */
+  writer(writer&& other) noexcept;
+
+  /**
    * Destructor.
    */
-  ~writer();
+  ~writer() noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  writer& operator=(const writer& other) noexcept = delete;
+
+  /**
+   * Move assignment operator.
+   */
+  writer& operator=(writer&& other) noexcept;
 
   void configure(const std::string& key,
                  const std::string& value) {
