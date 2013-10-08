@@ -11,12 +11,6 @@
 
 using namespace rdf;
 
-quad::quad() noexcept
-  : subject(nullptr),
-    predicate(nullptr),
-    object(nullptr),
-    context(nullptr) {}
-
 quad::quad(term* const subject,
            term* const predicate,
            term* const object,
@@ -29,7 +23,7 @@ quad::quad(term* const subject,
   assert(subject != nullptr);
   assert(predicate != nullptr);
   assert(object != nullptr);
-  /* context can be nullptr to designate the default context */
+  /* context can be `nullptr` to designate the default context */
 }
 
 quad::quad(const term* const subject,
@@ -57,8 +51,6 @@ quad::quad(const term& subject,
     predicate(predicate.clone()),
     object(object.clone()),
     context(context.clone()) {}
-
-quad::~quad() noexcept = default;
 
 void
 quad::reset() noexcept {

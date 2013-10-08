@@ -11,11 +11,6 @@
 
 using namespace rdf;
 
-triple::triple() noexcept
-  : subject(nullptr),
-    predicate(nullptr),
-    object(nullptr) {}
-
 triple::triple(term* const subject,
                term* const predicate,
                term* const object) noexcept
@@ -41,8 +36,6 @@ triple::triple(const term& subject,
   : subject(subject.clone()),
     predicate(predicate.clone()),
     object(object.clone()) {}
-
-triple::~triple() noexcept = default;
 
 void
 triple::reset() noexcept {

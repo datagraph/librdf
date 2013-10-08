@@ -10,16 +10,18 @@ namespace rdf {
   struct triple;
 }
 
+/**
+ * An RDF triple.
+ */
 struct rdf::triple {
-  std::unique_ptr<term> subject;
-  std::unique_ptr<term> predicate;
-  std::unique_ptr<term> object;
+  std::unique_ptr<term> subject   {nullptr}; /** The subject term. */
+  std::unique_ptr<term> predicate {nullptr}; /** The predicate term. */
+  std::unique_ptr<term> object    {nullptr}; /** The object term. */
 
-public:
   /**
    * Default constructor.
    */
-  triple() noexcept;
+  triple() noexcept = default;
 
   /**
    * Constructor.
@@ -39,7 +41,7 @@ public:
   /**
    * Destructor.
    */
-  ~triple() noexcept;
+  ~triple() noexcept = default;
 
   /**
    * Sets all terms to `nullptr`.

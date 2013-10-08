@@ -10,17 +10,19 @@ namespace rdf {
   struct term;
 }
 
+/**
+ * An RDF quad.
+ */
 struct rdf::quad {
-  std::unique_ptr<term> subject;
-  std::unique_ptr<term> predicate;
-  std::unique_ptr<term> object;
-  std::unique_ptr<term> context;
+  std::unique_ptr<term> subject   {nullptr}; /** The subject term. */
+  std::unique_ptr<term> predicate {nullptr}; /** The predicate term. */
+  std::unique_ptr<term> object    {nullptr}; /** The object term. */
+  std::unique_ptr<term> context   {nullptr}; /** The context/graph term. */
 
-public:
   /**
    * Default constructor.
    */
-  quad() noexcept;
+  quad() noexcept = default;
 
   /**
    * Constructor.
@@ -45,7 +47,7 @@ public:
   /**
    * Destructor.
    */
-  ~quad() noexcept;
+  ~quad() noexcept = default;
 
   /**
    * Sets all terms to `nullptr`.
