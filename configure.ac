@@ -129,7 +129,7 @@ AC_CHECK_FUNCS_ONCE([fmemopen])
 dnl Check for system services:
 
 dnl Generate output:
-AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile src/rdf++/Makefile test/Makefile test/rdf++/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile src/rdf++/Makefile test/Makefile])
 AC_SUBST([PACKAGE_VERSION_MAJOR], ["VERSION_MAJOR"])
 AC_SUBST([PACKAGE_VERSION_MINOR], ["VERSION_MINOR"])
 AC_SUBST([PACKAGE_VERSION_PATCH], ["VERSION_PATCH"])
