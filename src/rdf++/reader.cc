@@ -106,10 +106,10 @@ reader::reader(FILE* const stream,
 
 reader::~reader() noexcept = default;
 
-reader::reader(reader&&) noexcept = default;
+reader::reader(reader&&) /*noexcept*/ = default;
 
 reader&
-reader::operator=(reader&&) noexcept = default;
+reader::operator=(reader&&) /*noexcept*/ = default;
 
 void
 reader::read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) {

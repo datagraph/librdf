@@ -113,10 +113,10 @@ writer::writer(FILE* const stream,
 
 writer::~writer() noexcept = default;
 
-writer::writer(writer&&) noexcept = default;
+writer::writer(writer&&) /*noexcept*/ = default;
 
 writer&
-writer::operator=(writer&&) noexcept = default;
+writer::operator=(writer&&) /*noexcept*/ = default;
 
 void
 writer::configure(const char* const key,

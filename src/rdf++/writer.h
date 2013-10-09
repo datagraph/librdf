@@ -60,12 +60,12 @@ public:
   /**
    * Copy constructor.
    */
-  writer(const writer& other) noexcept = delete;
+  writer(const writer& other) = delete;
 
   /**
    * Move constructor.
    */
-  writer(writer&& other) noexcept;
+  writer(writer&& other) /*noexcept*/;
 
   /**
    * Destructor.
@@ -75,12 +75,12 @@ public:
   /**
    * Copy assignment operator.
    */
-  writer& operator=(const writer& other) noexcept = delete;
+  writer& operator=(const writer& other) = delete;
 
   /**
    * Move assignment operator.
    */
-  writer& operator=(writer&& other) noexcept;
+  writer& operator=(writer&& other) /*noexcept*/;
 
   void configure(const std::string& key,
                  const std::string& value) {

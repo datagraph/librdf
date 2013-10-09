@@ -87,12 +87,12 @@ public:
   /**
    * Copy constructor.
    */
-  reader(const reader& other) noexcept = delete;
+  reader(const reader& other) = delete;
 
   /**
    * Move constructor.
    */
-  reader(reader&& other) noexcept;
+  reader(reader&& other) /*noexcept*/;
 
   /**
    * Destructor.
@@ -102,12 +102,12 @@ public:
   /**
    * Copy assignment operator.
    */
-  reader& operator=(const reader& other) noexcept = delete;
+  reader& operator=(const reader& other) = delete;
 
   /**
    * Move assignment operator.
    */
-  reader& operator=(reader&& other) noexcept;
+  reader& operator=(reader&& other) /*noexcept*/;
 
   void read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback);
 
