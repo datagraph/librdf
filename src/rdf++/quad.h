@@ -3,11 +3,12 @@
 #ifndef RDFXX_QUAD_H
 #define RDFXX_QUAD_H
 
+#include "term.h"
+
 #include <memory> /* for std::unique_ptr */
 
 namespace rdf {
   struct quad;
-  struct term;
 }
 
 /**

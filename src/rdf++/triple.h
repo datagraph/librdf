@@ -3,10 +3,11 @@
 #ifndef RDFXX_TRIPLE_H
 #define RDFXX_TRIPLE_H
 
+#include "term.h"
+
 #include <memory> /* for std::unique_ptr */
 
 namespace rdf {
-  struct term;
   struct triple;
 }
 
