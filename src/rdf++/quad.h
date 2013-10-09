@@ -22,7 +22,7 @@ struct rdf::quad {
   /**
    * Default constructor.
    */
-  quad() noexcept = default;
+  quad() noexcept {}
 
   /**
    * Constructor.

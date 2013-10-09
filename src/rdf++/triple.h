@@ -21,7 +21,7 @@ struct rdf::triple {
   /**
    * Default constructor.
    */
-  triple() noexcept = default;
+  triple() noexcept {}
 
   /**
    * Constructor.
