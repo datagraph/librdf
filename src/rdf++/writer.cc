@@ -15,6 +15,10 @@
 #include "writer/raptor.h"
 #endif
 
+#ifndef DISABLE_RDFJSON
+#include "writer/rdfjson.h"
+#endif
+
 #ifndef DISABLE_TRIX
 #include "writer/trix.h"
 #endif
@@ -56,6 +60,12 @@ rdf_writer_for(FILE* const stream,
 #ifndef DISABLE_RAPTOR
   if (std::strcmp("raptor", format->module_name) == 0) {
     return rdf_writer_for_raptor(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_RDFJSON
+  if (std::strcmp("rdfjson", format->module_name) == 0) {
+    return rdf_writer_for_rdfjson(stream, content_type, charset, base_uri);
   }
 #endif
 

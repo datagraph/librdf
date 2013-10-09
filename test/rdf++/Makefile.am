@@ -23,6 +23,10 @@ if !DISABLE_NQUADS
   check_PROGRAMS += check_reader_nquads check_writer_nquads
 endif
 
+if !DISABLE_RDFJSON
+  check_PROGRAMS += check_writer_rdfjson
+endif
+
 if !DISABLE_RDFXML
   check_PROGRAMS += check_reader_rdfxml check_writer_rdfxml
 endif

@@ -24,6 +24,7 @@ check_version
 check_writer
 check_writer_jsonld
 check_writer_nquads
+check_writer_rdfjson
 check_writer_rdfxml
 check_writer_trig
 check_writer_trix

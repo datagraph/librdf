@@ -75,13 +75,14 @@ AC_DEFUN([AX_ARG_ENABLE_FORMAT], [dnl
     AC_DEFINE([DISABLE_]RDF_FORMAT_ID, 1, [Define to omit the $2 module.])])
   AM_CONDITIONAL([DISABLE_]RDF_FORMAT_ID, [test "x$enable_$1" == "xno"])
 ])
-AX_ARG_ENABLE_FORMAT([jsonld], [JSON-LD]) # --enable-jsonld/--disable-jsonld
-AX_ARG_ENABLE_FORMAT([nquads], [N-Quads]) # --enable-nquads/--disable-nquads
-AX_ARG_ENABLE_FORMAT([rdfxml], [RDF/XML]) # --enable-rdfxml/--disable-rdfxml
-AX_ARG_ENABLE_FORMAT([trig],   [TriG])    # --enable-trig/--disable-trig
-AX_ARG_ENABLE_FORMAT([trix],   [TriX])    # --enable-trix/--disable-trix
-AX_ARG_ENABLE_FORMAT([turtle], [Turtle])  # --enable-turtle/--disable-turtle
-AX_ARG_ENABLE_FORMAT([xslt],   [XSLT])    # --enable-xslt/--disable-xslt
+AX_ARG_ENABLE_FORMAT([jsonld],  [JSON-LD])  # --enable-jsonld/--disable-jsonld
+AX_ARG_ENABLE_FORMAT([nquads],  [N-Quads])  # --enable-nquads/--disable-nquads
+AX_ARG_ENABLE_FORMAT([rdfjson], [RDF/JSON]) # --enable-rdfxml/--disable-rdfxml
+AX_ARG_ENABLE_FORMAT([rdfxml],  [RDF/XML])  # --enable-rdfxml/--disable-rdfxml
+AX_ARG_ENABLE_FORMAT([trig],    [TriG])     # --enable-trig/--disable-trig
+AX_ARG_ENABLE_FORMAT([trix],    [TriX])     # --enable-trix/--disable-trix
+AX_ARG_ENABLE_FORMAT([turtle],  [Turtle])   # --enable-turtle/--disable-turtle
+AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
 # libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)

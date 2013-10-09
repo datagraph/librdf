@@ -40,12 +40,16 @@ static const format rdf_format_info[] = {
 #ifndef DISABLE_TRIX
   {"application/trix",      nullptr, "trix",   "trix",   nullptr,  nullptr},
 #endif
+#ifndef DISABLE_RDFJSON
+  /* RDF/JSON (.rj) */
+  {"application/rdf+json",  "UTF-8", "rj",     "rdfjson", nullptr, nullptr},
+#endif
 #ifndef DISABLE_RDFXML
   /* RDF/XML (.rdf) */
 #if 0
-  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml",},
+  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml"},
 #else
-  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml-abbrev",},
+  {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml-abbrev"},
 #endif
 #endif
   /* RDF/JSON (.json) */

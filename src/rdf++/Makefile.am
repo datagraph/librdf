@@ -13,9 +13,7 @@ librdf___la_SOURCES =     \
   quad.cc                 \
   raptor.cc               \
   reader.cc               \
-  reader/jsonld.cc        \
   reader/raptor.cc        \
-  reader/trix.cc          \
   term.cc                 \
   triple.cc               \
   version.cc              \
@@ -36,17 +34,21 @@ base_pkginclude_HEADERS = \
   writer.h
 
 if !DISABLE_JSONLD
-  librdf___la_SOURCES += writer/jsonld.cc
+  librdf___la_SOURCES += reader/jsonld.cc writer/jsonld.cc
 endif
 
 if !DISABLE_NQUADS
   librdf___la_SOURCES += writer/raptor.cc
 endif
 
+if !DISABLE_RDFJSON
+  librdf___la_SOURCES += writer/rdfjson.cc
+endif
+
 if !DISABLE_TRIX
   AM_CPPFLAGS += $(libxml2_CFLAGS)
   librdf___la_LIBADD += $(libxml2_LIBS)
-  librdf___la_SOURCES += writer/trix.cc
+  librdf___la_SOURCES += reader/trix.cc writer/trix.cc
 endif
 
 if !DISABLE_XSLT
