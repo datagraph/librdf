@@ -4,7 +4,7 @@
 #include <config.h>
 #endif
 
-#include "rdf++/writer/jsonld.h"
+#include "jsonld.h"
 
 #include <cassert> /* for assert() */
 

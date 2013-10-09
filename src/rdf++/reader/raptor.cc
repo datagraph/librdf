@@ -4,13 +4,12 @@
 #include <config.h>
 #endif
 
-#include "rdf++/reader/raptor.h"
-
-#include "rdf++/format.h"
-#include "rdf++/quad.h"
-#include "rdf++/raptor.h"
-#include "rdf++/term.h"
-#include "rdf++/triple.h"
+#include "raptor.h"
+#include "../format.h"
+#include "../quad.h"
+#include "../raptor.h"
+#include "../term.h"
+#include "../triple.h"
 
 #include <cassert>    /* for assert() */
 #include <cstdlib>    /* for std::malloc() */

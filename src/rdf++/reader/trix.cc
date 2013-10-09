@@ -4,13 +4,11 @@
 #include <config.h>
 #endif
 
-#include "rdf++/reader/trix.h"
-
-#include "rdf++/quad.h"
-#include "rdf++/term.h"
-#include "rdf++/triple.h"
-
+#include "trix.h"
 #include "xml_reader.h"
+#include "../quad.h"
+#include "../term.h"
+#include "../triple.h"
 
 #include <memory>  /* for std::unique_ptr */
 #include <cstring> /* for std::strcmp() */

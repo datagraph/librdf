@@ -4,8 +4,7 @@
 #include <config.h>
 #endif
 
-#include "rdf++/writer/trix.h"
-
+#include "trix.h"
 #include "xml_writer.h"
 
 #include <cassert> /* for assert() */
