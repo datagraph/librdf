@@ -54,6 +54,22 @@ struct rdf::quad {
    * Sets all terms to `nullptr`.
    */
   void reset() noexcept;
+
+  inline bool has_context() const noexcept {
+    return context.get() != nullptr;
+  }
+
+  inline bool has_subject() const noexcept {
+    return subject.get() != nullptr;
+  }
+
+  inline bool has_predicate() const noexcept {
+    return predicate.get() != nullptr;
+  }
+
+  inline bool has_object() const noexcept {
+    return object.get() != nullptr;
+  }
 };
 
 #endif /* RDFXX_QUAD_H */
