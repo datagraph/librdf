@@ -280,7 +280,9 @@ implementation::begin_element(trix_context& context) {
         if (context.graph) {
           throw_error(context, "repeated <uri> element inside <graph> element");
         }
-        context.graph.reset(new rdf::uri_reference(_reader.read_string()));
+        const auto uri_string = _reader.read_string();
+        context.graph.reset(new rdf::uri_reference(uri_string));
+        xmlFree(uri_string); // FIXME
         break;
       }
       ensure_state(context, trix_state::triple);
@@ -363,11 +365,14 @@ implementation::construct_term(trix_context& context) {
         throw_error(context, "missing 'datatype' attribute for <typedLiteral> element");
       }
       term = new rdf::typed_literal(text, datatype_uri);
+      xmlFree(datatype_uri); // FIXME
       break;
     }
 
     default: abort(); /* never reached */
   }
+
+  xmlFree(text); // FIXME
 
   return term;
 }
