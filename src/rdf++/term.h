@@ -10,11 +10,11 @@
 
 namespace rdf {
   enum class term_type : int {
-    none = 0,
-    uri_reference,
-    blank_node,
-    plain_literal,
-    typed_literal,
+    none          = 0,
+    uri_reference = 1,
+    blank_node    = 2,
+    plain_literal = 3,
+    typed_literal = 4,
   };
 
   enum class term_position : int {
