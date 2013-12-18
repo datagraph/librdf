@@ -4,6 +4,7 @@
 #define RDFXX_TERM_H
 
 #include <cassert>   /* for assert() */
+#include <memory>    /* for std::unique_ptr */
 #include <stdexcept> /* for std::invalid_argument */
 #include <string>    /* for std::string */
 
@@ -41,6 +42,15 @@ struct rdf::term {
 public:
   const term_type type;
   std::string string;
+
+  /**
+   * @throws std::invalid_argument if `type` is invalid
+   */
+  static std::unique_ptr<term> create(
+    term_type type,
+    const char* string,
+    const char* language_tag = nullptr,
+    const char* datatype_uri = nullptr);
 
   virtual ~term() = default;
 
