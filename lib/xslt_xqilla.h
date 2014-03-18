@@ -227,7 +227,7 @@ public:
   }
 
 private:
-  AutoDelete<XQQuery> _query = {nullptr};
+  AutoDelete<XQQuery> _query {nullptr};
 };
 
 #endif /* XSLT_XQILLA_H */

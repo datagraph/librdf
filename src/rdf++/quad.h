@@ -15,10 +15,10 @@ namespace rdf {
  * An RDF quad.
  */
 struct rdf::quad {
-  std::unique_ptr<term> subject   {nullptr}; /** The subject term. */
-  std::unique_ptr<term> predicate {nullptr}; /** The predicate term. */
-  std::unique_ptr<term> object    {nullptr}; /** The object term. */
-  std::unique_ptr<term> context   {nullptr}; /** The context/graph term. */
+  std::unique_ptr<term> subject;   /** The subject term. */
+  std::unique_ptr<term> predicate; /** The predicate term. */
+  std::unique_ptr<term> object;    /** The object term. */
+  std::unique_ptr<term> context;   /** The context/graph term. */
 
   /**
    * Default constructor.
