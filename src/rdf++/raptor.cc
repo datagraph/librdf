@@ -40,8 +40,8 @@ std_iostream_write_byte(void* const user_data,
  * http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-write-bytes-func
  */
 static int
-std_iostream_write_bytes(void* const restrict user_data,
-                         const void* const restrict data,
+std_iostream_write_bytes(void* const user_data,
+                         const void* const data,
                          const std::size_t size,
                          const std::size_t nmemb) {
 #if 0
@@ -65,8 +65,8 @@ std_iostream_write_bytes(void* const restrict user_data,
  * @see http://librdf.org/raptor/api/raptor2-section-iostream.html#raptor-iostream-read-bytes-func
  */
 static int
-std_iostream_read_bytes(void* const restrict user_data,
-                        void* const restrict data_,
+std_iostream_read_bytes(void* const user_data,
+                        void* const data_,
                         const std::size_t size,
                         const std::size_t nmemb) {
 
