@@ -54,7 +54,7 @@ blank_node::blank_node()
   const auto suffix = random_uint();
 
   char buffer[32];
-  std::sprintf(buffer, "g%016zu%03u", prefix, suffix % 1000);
+  std::sprintf(buffer, "g%016zu%03u", static_cast<std::size_t>(prefix), suffix % 1000);
 
   string.assign(buffer);
 }
