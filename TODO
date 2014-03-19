@@ -3,3 +3,4 @@
   - README.rst
   - src/rdf++/reader/impl.h
   - src/rdf++/writer/impl.h
+- Implement fmemopen() for Mac OS X based on funopen().

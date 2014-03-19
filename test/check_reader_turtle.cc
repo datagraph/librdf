@@ -15,13 +15,16 @@
 #include <cstdio>         /* for stdout, fmemopen() */
 #include <cstring>
 
+#ifdef HAVE_FMEMOPEN
 TEST_CASE("test_ctor") {
   char input_data[] = "[] a <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .\n";
   FILE* const input = fmemopen(reinterpret_cast<void*>(input_data), sizeof(input_data) - 1, "r");
 
   REQUIRE_NOTHROW(rdf::reader reader(input, "text/turtle", "UTF-8", "http://example.org/"));
 }
+#endif
 
+#ifdef HAVE_FMEMOPEN
 TEST_CASE("test_blank_node_labels") {
   char input_data[] = "[] a <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .\n";
   FILE* const input = fmemopen(reinterpret_cast<void*>(input_data), sizeof(input_data) - 1, "r");
@@ -34,3 +37,4 @@ TEST_CASE("test_blank_node_labels") {
     REQUIRE(triple->subject->string != "genid1");
   });
 }
+#endif
