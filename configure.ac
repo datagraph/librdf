@@ -85,8 +85,6 @@ AX_ARG_ENABLE_FORMAT([turtle],  [Turtle])   # --enable-turtle/--disable-turtle
 AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
-# libboost (libboost-dev on Ubuntu, boost on Mac OS X + MacPorts)
-AX_BOOST_BASE([1.48], [AX_BOOST_UNIT_TEST_FRAMEWORK])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
@@ -109,13 +107,12 @@ dnl Check for structures:
 
 dnl Check for compiler characteristics:
 AC_CANONICAL_HOST
-AC_C_RESTRICT
-AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/lib -I\$(top_srcdir)/src -iquote \$(srcdir) \$(BOOST_CPPFLAGS)"
+AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/lib -I\$(top_srcdir)/src -iquote \$(srcdir)"
 AM_CXXFLAGS="$AM_CXXFLAGS -Wall -Wextra -pipe"
-AM_LDFLAGS="$AM_LDFLAGS \$(BOOST_LDFLAGS)"
-TEST_CPPFLAGS="$AM_CPPFLAGS -DBOOST_TEST_DYN_LINK"
+AM_LDFLAGS="$AM_LDFLAGS"
+TEST_CPPFLAGS="$AM_CPPFLAGS -DCATCH_CONFIG_MAIN"
 TEST_CXXFLAGS="$AM_CXXFLAGS"
-TEST_LDFLAGS="$AM_LDFLAGS \$(BOOST_UNIT_TEST_FRAMEWORK_LIB)"
+TEST_LDFLAGS="$AM_LDFLAGS"
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])

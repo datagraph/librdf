@@ -1,7 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-#define BOOST_TEST_MODULE reader_nquads
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <rdf++/reader.h> /* for rdf::reader */
 
@@ -16,36 +15,36 @@ static const std::string input =
   "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US <http://example.org/> .\n"
   "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US .\n";
 
-BOOST_AUTO_TEST_CASE(test_ctor) {
-  BOOST_CHECK(true); // TODO
+TEST_CASE("test_ctor") {
+  // TODO
 }
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_ctor) {
+TEST_CASE("test_ctor") {
   std::istringstream stream(input);
   rdf::reader reader(stream, "text/x-nquads", "UTF-8", "http://example.org/");
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 #endif
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_read_triples) {
+TEST_CASE("test_read_triples") {
   std::istringstream stream(input);
   rdf::reader reader(stream, "text/x-nquads", "UTF-8", "http://example.org/");
   reader.read_triples([](std::unique_ptr<rdf::triple> triple) {
     std::cout << "test_read_triple\n";
   });
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 #endif
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_read_quads) {
+TEST_CASE("test_read_quads") {
   std::istringstream stream(input);
   rdf::reader reader(stream, "text/x-nquads", "UTF-8", "http://example.org/");
   reader.read_quads([](std::unique_ptr<rdf::quad> quad) {
     std::cout << "test_read_quad\n";
   });
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 #endif

@@ -1,7 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-#define BOOST_TEST_MODULE writer_xslt
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <rdf++/writer.h> /* for rdf::writer */
 
@@ -12,13 +11,13 @@
 #include <cstdio>         /* for stdout */
 #include <sstream>        /* for std::ostringstream */
 
-BOOST_AUTO_TEST_CASE(test_ctor) {
+TEST_CASE("test_ctor") {
   //rdf::writer writer(stdout, "application/xml", "UTF-8", "http://example.org/");
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 
 #if 0
-BOOST_AUTO_TEST_CASE(test_write_triple) {
+TEST_CASE("test_write_triple") {
   const rdf::triple triple = {
     rdf::blank_node("foo"),
     rdf::uri_reference("http://www.w3.org/2000/01/rdf-schema#seeAlso"),
@@ -32,7 +31,7 @@ BOOST_AUTO_TEST_CASE(test_write_triple) {
   // TODO
 }
 
-BOOST_AUTO_TEST_CASE(test_write_quad) {
+TEST_CASE("test_write_quad") {
   const rdf::quad quad = {
     rdf::blank_node("hello"),
     rdf::uri_reference("http://purl.org/dc/terms/title"),
@@ -47,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_write_quad) {
   // TODO
 }
 
-BOOST_AUTO_TEST_CASE(test_write_quad_without_context) {
+TEST_CASE("test_write_quad_without_context") {
   const rdf::quad quad = {
     rdf::blank_node("hello"),
     rdf::uri_reference("http://purl.org/dc/terms/title"),

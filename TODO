@@ -1,0 +1,5 @@
+- Remove the spurious dependency on Boost.Utility:
+  - .travis.yml
+  - README.rst
+  - src/rdf++/reader/impl.h
+  - src/rdf++/writer/impl.h

@@ -1,7 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-#define BOOST_TEST_MODULE writer_nquads
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <rdf++/writer.h> /* for rdf::writer */
 
@@ -11,17 +10,17 @@
 
 #include <sstream>        /* for std::ostringstream */
 
-BOOST_AUTO_TEST_CASE(test_ctor) {
+TEST_CASE("test_ctor") {
   rdf::writer writer(std::cout, "text/x-nquads", "UTF-8", "http://example.org/");
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 
-BOOST_AUTO_TEST_CASE(test_define_prefix) {
-  BOOST_CHECK(true); // TODO
+TEST_CASE("test_define_prefix") {
+  // TODO
 }
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_write_triple) {
+TEST_CASE("test_write_triple") {
   std::ostringstream stream;
   const rdf::triple triple = {
     rdf::blank_node("foo"),
@@ -32,12 +31,12 @@ BOOST_AUTO_TEST_CASE(test_write_triple) {
   writer.begin();
   writer.write_triple(triple);
   writer.finish();
-  BOOST_CHECK_EQUAL(stream.str(), "_:foo <http://www.w3.org/2000/01/rdf-schema#seeAlso> _:bar .\n");
+  REQUIRE(stream.str() == "_:foo <http://www.w3.org/2000/01/rdf-schema#seeAlso> _:bar .\n");
 }
 #endif
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_write_quad) {
+TEST_CASE("test_write_quad") {
   std::ostringstream stream;
   const rdf::quad quad = {
     rdf::blank_node("hello"),
@@ -49,12 +48,12 @@ BOOST_AUTO_TEST_CASE(test_write_quad) {
   writer.begin();
   writer.write_quad(quad);
   writer.finish();
-  BOOST_CHECK_EQUAL(stream.str(), "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US <http://example.org/> .\n");
+  REQUIRE(stream.str() == "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US <http://example.org/> .\n");
 }
 #endif
 
 #if 0 // FIXME
-BOOST_AUTO_TEST_CASE(test_write_quad_without_context) {
+TEST_CASE("test_write_quad_without_context") {
   std::ostringstream stream;
   const rdf::quad quad = {
     rdf::blank_node("hello"),
@@ -65,6 +64,6 @@ BOOST_AUTO_TEST_CASE(test_write_quad_without_context) {
   writer.begin();
   writer.write_quad(quad);
   writer.finish();
-  BOOST_CHECK_EQUAL(stream.str(), "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US .\n");
+  REQUIRE(stream.str() == "_:hello <http://purl.org/dc/terms/title> \"Hello, world!\"@en-US .\n");
 }
 #endif

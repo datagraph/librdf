@@ -1,7 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-#define BOOST_TEST_MODULE reader_trix
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <rdf++/reader.h> /* for rdf::reader */
 #include <rdf++/writer.h> /* for rdf::writer */
@@ -17,11 +16,11 @@ examples() {
   return fopen("examples.xml", "r");
 }
 
-BOOST_AUTO_TEST_CASE(test_ctor) {
-  BOOST_CHECK(true); // TODO
+TEST_CASE("test_ctor") {
+  // TODO
 }
 
-BOOST_AUTO_TEST_CASE(test_read_triples) {
+TEST_CASE("test_read_triples") {
   rdf::writer writer(stdout, "application/trix", "UTF-8", "http://example.org/");
   rdf::reader reader(examples(), "application/trix", "UTF-8", "http://example.org/");
   writer.begin();
@@ -29,10 +28,10 @@ BOOST_AUTO_TEST_CASE(test_read_triples) {
     writer.write_triple(*triple);
   });
   writer.finish();
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
 
-BOOST_AUTO_TEST_CASE(test_read_quads) {
+TEST_CASE("test_read_quads") {
   rdf::writer writer(stdout, "application/trix", "UTF-8", "http://example.org/");
   rdf::reader reader(examples(), "application/trix", "UTF-8", "http://example.org/");
   writer.begin();
@@ -40,5 +39,5 @@ BOOST_AUTO_TEST_CASE(test_read_quads) {
     writer.write_quad(*quad);
   });
   writer.finish();
-  BOOST_CHECK(true); // TODO
+  // TODO
 }
