@@ -70,6 +70,26 @@ struct rdf::quad {
   inline bool has_object() const noexcept {
     return object.get() != nullptr;
   }
+
+  inline const std::unique_ptr<term>& operator[](const std::size_t index) const {
+    switch (index) {
+      case 0:  return context;
+      case 1:  return subject;
+      case 2:  return predicate;
+      case 3:  return object;
+      default: throw std::out_of_range("subscript must be 0..3");
+    }
+  }
+
+  inline std::unique_ptr<term>& operator[](const std::size_t index) {
+    switch (index) {
+      case 0:  return context;
+      case 1:  return subject;
+      case 2:  return predicate;
+      case 3:  return object;
+      default: throw std::out_of_range("subscript must be 0..3");
+    }
+  }
 };
 
 #endif /* RDFXX_QUAD_H */
