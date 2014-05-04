@@ -80,7 +80,7 @@ protected:
     : type(type), string(string) {}
 
   term(const term_type type, const char* const string)
-    : type(type), string(string) {}
+    : type(type), string(string ? string : "") {}
 };
 
 /**

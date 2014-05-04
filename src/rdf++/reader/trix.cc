@@ -355,7 +355,7 @@ implementation::construct_term(trix_context& context) {
     }
 
     case trix_element::plain_literal: {
-      term = new rdf::plain_literal(text, _reader.xml_lang());
+      term = new rdf::plain_literal(text ? text : "", _reader.xml_lang());
       break;
     }
 
