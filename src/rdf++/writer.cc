@@ -90,6 +90,7 @@ writer::writer(const std::string& file_path,
                const std::string& charset,
                const std::string& base_uri)
   : _implementation(nullptr) {
+  assert(false && "file paths not supported yet"); // TODO
   (void)file_path, (void)content_type, (void)charset, (void)base_uri; // TODO
 }
 
@@ -98,6 +99,7 @@ writer::writer(std::ostream& stream,
                const std::string& charset,
                const std::string& base_uri)
   : _implementation(nullptr) {
+  assert(false && "std::ostream not supported yet"); // TODO
   (void)stream, (void)content_type, (void)charset, (void)base_uri; // TODO
 }
 
@@ -121,7 +123,7 @@ writer::operator=(writer&&) /*noexcept*/ = default;
 void
 writer::configure(const char* const key,
                   const char* const value) {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   assert(key != nullptr); // FIXME
   _implementation->configure(key, value);
 }
@@ -129,42 +131,42 @@ writer::configure(const char* const key,
 void
 writer::define_prefix(const std::string& prefix,
                       const std::string& uri_string) {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   (void)prefix, (void)uri_string; // TODO
 }
 
 void
 writer::begin() {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->begin();
 }
 
 void
 writer::finish() {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->finish();
 }
 
 void
 writer::flush() {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->flush();
 }
 
 void
 writer::write_triple(const triple& triple) {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->write_triple(triple);
 }
 
 void
 writer::write_quad(const quad& quad) {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->write_quad(quad);
 }
 
 void
 writer::write_comment(const char* const comment) {
-  assert(_implementation != nullptr);
+  assert(_implementation);
   _implementation->write_comment(comment);
 }
