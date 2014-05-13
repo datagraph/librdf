@@ -79,8 +79,14 @@ implementation::write_triple(const rdf::triple& triple) {
   _json.begin_object();
   _json.write_string("@id");
   write_id(subject);
-  _json.write_string(predicate.string.c_str());
-  write_object_term(object);
+  if (predicate.string.compare("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0) {
+    _json.write_string("@type");
+    write_id(object);
+  }
+  else {
+    _json.write_string(predicate.string.c_str());
+    write_object_term(object);
+  }
   _json.finish_object();
 
   _count++;
@@ -96,8 +102,14 @@ implementation::write_quad(const rdf::quad& quad) {
   _json.begin_object();
   _json.write_string("@id");
   write_id(subject);
-  _json.write_string(predicate.string.c_str());
-  write_object_term(object);
+  if (predicate.string.compare("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0) {
+    _json.write_string("@type");
+    write_id(object);
+  }
+  else {
+    _json.write_string(predicate.string.c_str());
+    write_object_term(object);
+  }
   _json.finish_object();
 
   _count++;
