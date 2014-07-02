@@ -41,8 +41,10 @@ static const format rdf_format_info[] = {
   {"application/trix",      nullptr, "trix",   "trix",   nullptr,  nullptr},
 #endif
 #ifndef DISABLE_RDFJSON
-  /* RDF/JSON (.rj) */
+  /* RDF/JSON (.rj, .json) */
   {"application/rdf+json",  "UTF-8", "rj",     "rdfjson", nullptr, nullptr},
+  {"application/json",      "UTF-8", "json",   "rdfjson", nullptr, nullptr},
+  {"text/json",             "UTF-8", nullptr,  "rdfjson", nullptr, nullptr},           /* unofficial, deprecated */
 #endif
 #ifndef DISABLE_RDFXML
   /* RDF/XML (.rdf) */
@@ -52,9 +54,6 @@ static const format rdf_format_info[] = {
   {"application/rdf+xml",   nullptr, "rdf",    "raptor", "rdfxml", "rdfxml-abbrev"},
 #endif
 #endif
-  /* RDF/JSON (.json) */
-  {"application/json",      nullptr, "json",   "raptor", "json", "json"},
-  {"text/json",             nullptr, nullptr,  "raptor", "json", "json"},              /* unofficial, deprecated */
 #ifndef DISABLE_JSONLD
   /* JSON-LD (.jsonld) */
   {"application/ld+json",   nullptr, "jsonld", "jsonld", nullptr, nullptr},
