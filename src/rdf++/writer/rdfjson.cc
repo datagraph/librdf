@@ -8,6 +8,7 @@
 #include <rfc/json/json_writer.h>
 
 #include <cassert> /* for assert() */
+#include <cstdio>  /* for std::snprintf() */
 #include <map>     /* for std::map */
 #include <memory>  /* for std::unique_ptr */
 #include <vector>  /* for std::vector */
@@ -30,6 +31,7 @@ namespace {
     virtual void flush() override;
 
   protected:
+    void write_triple(const rdf::term& subject, const rdf::term& predicate, const rdf::term& object);
     void write_object_term(const rdf::term& term);
 
   private:
@@ -114,10 +116,7 @@ implementation::write_triple(const rdf::triple& triple) {
   const auto& subject   = *triple.subject;
   const auto& predicate = *triple.predicate;
   const auto& object    = *triple.object;
-
-  _data[subject.string][predicate.string].emplace_back(object.clone());
-
-  _count++;
+  write_triple(subject, predicate, object);
 }
 
 void
@@ -125,10 +124,7 @@ implementation::write_quad(const rdf::quad& quad) {
   const auto& subject   = *quad.subject;
   const auto& predicate = *quad.predicate;
   const auto& object    = *quad.object;
-
-  _data[subject.string][predicate.string].emplace_back(object.clone());
-
-  _count++;
+  write_triple(subject, predicate, object);
 }
 
 void
@@ -139,6 +135,22 @@ implementation::write_comment(const char* const comment) {
 void
 implementation::flush() {
   _json.flush();
+}
+
+void
+implementation::write_triple(const rdf::term& subject,
+                             const rdf::term& predicate,
+                             const rdf::term& object) {
+  if (subject.is_blank_node()) {
+    char subject_string[2 + subject.string.size() + 1];
+    std::snprintf(subject_string, sizeof(subject_string), "_:%s", subject.string.c_str());
+    _data[subject_string][predicate.string].emplace_back(object.clone());
+  }
+  else {
+    _data[subject.string][predicate.string].emplace_back(object.clone());
+  }
+
+  _count++;
 }
 
 void
