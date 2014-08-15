@@ -38,6 +38,10 @@ if !DISABLE_JSONLD
 endif
 
 if !DISABLE_NQUADS
+  librdf___la_SOURCES += reader/nquads.cc writer/nquads.cc
+endif
+
+if !DISABLE_TURTLE
   librdf___la_SOURCES += writer/raptor.cc
 endif
 

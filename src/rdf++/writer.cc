@@ -11,6 +11,10 @@
 #include "writer/jsonld.h"
 #endif
 
+#ifndef DISABLE_NQUADS
+#include "writer/nquads.h"
+#endif
+
 #ifndef DISABLE_RAPTOR
 #include "writer/raptor.h"
 #endif
@@ -54,6 +58,12 @@ rdf_writer_for(FILE* const stream,
 #ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     return rdf_writer_for_jsonld(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_NQUADS
+  if (std::strcmp("nquads", format->module_name) == 0) {
+    return rdf_writer_for_nquads(stream, content_type, charset, base_uri);
   }
 #endif
 

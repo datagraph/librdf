@@ -11,6 +11,10 @@
 #include "rdf++/reader/jsonld.h"
 #endif
 
+#ifndef DISABLE_NQUADS
+#include "rdf++/reader/nquads.h"
+#endif
+
 #ifndef DISABLE_RAPTOR
 #include "rdf++/reader/raptor.h"
 #endif
@@ -52,6 +56,12 @@ rdf_reader_for(FILE* stream,
 #ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     return rdf_reader_for_jsonld(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_NQUADS
+  if (std::strcmp("nquads", format->module_name) == 0) {
+    return rdf_reader_for_nquads(stream, content_type, charset, base_uri);
   }
 #endif
 

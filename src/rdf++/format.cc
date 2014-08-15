@@ -15,14 +15,14 @@ using namespace rdf;
 static const format rdf_format_info[] = {
 #ifndef DISABLE_NQUADS
   /* N-Triples (.nt) */
-  {"application/n-triples", "UTF-8", "nt",     "raptor", "ntriples", "ntriples"},      /* official */
-  {"text/plain",            "ASCII", nullptr,  "raptor", "ntriples", "ntriples"},
-  {"text/ntriples",         nullptr, nullptr,  "raptor", "ntriples", "ntriples"},      /* unofficial, by analogy with Turtle */
-  {"text/x-ntriples",       nullptr, nullptr,  "raptor", "ntriples", "ntriples"},      /* unofficial, by analogy with N-Quads */
+  {"application/n-triples", "UTF-8", "nt",     "nquads", "ntriples", "ntriples"},      /* official */
+  {"text/plain",            "ASCII", nullptr,  "nquads", "ntriples", "ntriples"},
+  {"text/ntriples",         nullptr, nullptr,  "nquads", "ntriples", "ntriples"},      /* unofficial, by analogy with Turtle */
+  {"text/x-ntriples",       nullptr, nullptr,  "nquads", "ntriples", "ntriples"},      /* unofficial, by analogy with N-Quads */
   /* N-Quads (.nq) */
-  {"application/n-quads",   "UTF-8", "nq",     "raptor", "nquads", "nquads"},          /* official */
-  {"text/nquads",           nullptr, nullptr,  "raptor", "nquads", "nquads"},          /* unofficial, by analogy with Turtle */
-  {"text/x-nquads",         nullptr, nullptr,  "raptor", "nquads", "nquads"},
+  {"application/n-quads",   "UTF-8", "nq",     "nquads", "nquads", "nquads"},          /* official */
+  {"text/nquads",           nullptr, nullptr,  "nquads", "nquads", "nquads"},          /* unofficial, by analogy with Turtle */
+  {"text/x-nquads",         nullptr, nullptr,  "nquads", "nquads", "nquads"},
 #endif
 #ifndef DISABLE_TURTLE
   /* Turtle (.ttl) */
