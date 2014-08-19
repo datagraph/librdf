@@ -240,9 +240,12 @@ implementation::read_escaped_string(const char* _input,
     else if (c == '\\') {
       switch (c = *input++) {
         case 't':  result.push_back('\t'); break;
+        case 'b':  result.push_back('\b'); break;
         case 'n':  result.push_back('\n'); break;
         case 'r':  result.push_back('\r'); break;
+        case 'f':  result.push_back('\f'); break;
         case '"':  result.push_back('"');  break;
+        case '\'': result.push_back('\'');  break;
         case '\\': result.push_back('\\'); break;
         case 'u':
         case 'U': {
