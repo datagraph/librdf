@@ -10,7 +10,7 @@
 #include "../triple.h"
 
 #include <cassert>   /* for assert() */
-#include <cstdio>    /* for std::fgets() */
+#include <cstdio>    /* for FILE, std::f*() */
 #include <cctype>    /* for std::is*() */
 #include <cstring>   /* for std::strncpy() */
 #include <stdexcept> /* for std::invalid_argument */
