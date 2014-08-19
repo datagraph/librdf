@@ -36,6 +36,8 @@ namespace {
 
   protected:
     void write_term(const rdf::term& term);
+    void write_escaped_iriref(const char* string);
+    void write_escaped_string(const char* string);
   };
 }
 
@@ -127,19 +129,23 @@ implementation::write_term(const rdf::term& term_) {
   switch (term_.type) {
     case rdf::term_type::uri_reference: {
       const auto& term = dynamic_cast<const rdf::uri_reference&>(term_);
-      std::fprintf(_stream, "<%s>", term.string.c_str()); // TODO: implement character escaping
+      std::fputc('<', _stream);
+      write_escaped_iriref(term.string.c_str());
+      std::fputc('>', _stream);
       break;
     }
 
     case rdf::term_type::blank_node: {
       const auto& term = dynamic_cast<const rdf::blank_node&>(term_);
-      std::fprintf(_stream, "_:%s", term.string.c_str()); // TODO: implement character escaping
+      std::fprintf(_stream, "_:%s", term.string.c_str());
       break;
     }
 
     case rdf::term_type::plain_literal: {
       const auto& term = dynamic_cast<const rdf::plain_literal&>(term_);
-      std::fprintf(_stream, "\"%s\"", term.string.c_str()); // TODO: implement character escaping
+      std::fputc('"', _stream);
+      write_escaped_string(term.string.c_str());
+      std::fputc('"', _stream);
       if (!term.language_tag.empty()) {
         std::fprintf(_stream, "@%s", term.language_tag.c_str());
       }
@@ -148,12 +154,57 @@ implementation::write_term(const rdf::term& term_) {
 
     case rdf::term_type::typed_literal: {
       const auto& term = dynamic_cast<const rdf::typed_literal&>(term_);
-      std::fprintf(_stream, "\"%s\"^^<%s>", term.string.c_str(), term.datatype_uri.c_str()); // TODO: implement character escaping
+      std::fputc('"', _stream);
+      write_escaped_string(term.string.c_str());
+      std::fputs("\"^^<", _stream);
+      write_escaped_iriref(term.datatype_uri.c_str());
+      std::fputc('>', _stream);
       break;
     }
 
     default: {
        assert(false && "invalid term type for #write_term");
+    }
+  }
+}
+
+void
+implementation::write_escaped_iriref(const char* string) {
+  // @see http://www.w3.org/TR/n-quads/#grammar-production-IRIREF
+  char c;
+  while ((c = *string++) != '\0') {
+    switch (c) {
+      // @see http://www.w3.org/TR/n-quads/#grammar-production-UCHAR
+      case '\x00'...'\x20':
+      case '<': case '>': case '"': case '{': case '}':
+      case '|': case '^': case '`': case '\\':
+        std::fprintf(_stream, "\\u%04X", c);
+        break;
+      default:
+        std::fputc(c, _stream); // TODO: implement UCHAR escaping
+    }
+  }
+}
+
+void
+implementation::write_escaped_string(const char* string) {
+  // @see http://www.w3.org/TR/n-quads/#grammar-production-STRING_LITERAL_QUOTE
+  char c;
+  while ((c = *string++) != '\0') {
+    switch (c) {
+      // @see http://www.w3.org/TR/n-quads/#grammar-production-ECHAR
+      case '\t': std::fputs("\\t", _stream);  break;
+      case '\b': std::fputs("\\b", _stream);  break;
+      case '\n': std::fputs("\\n", _stream);  break;
+      case '\r': std::fputs("\\r", _stream);  break;
+      case '\f': std::fputs("\\f", _stream);  break;
+      case '"':  std::fputs("\\\"", _stream); break;
+      //case '\'': std::fputs("\\'", _stream); /* not needed */
+      case '\\': std::fputs("\\\\", _stream); break;
+
+      // @see http://www.w3.org/TR/n-quads/#grammar-production-UCHAR
+      default:
+        std::fputc(c, _stream); // TODO: implement UCHAR escaping
     }
   }
 }
