@@ -44,7 +44,6 @@ namespace {
     virtual void abort() override;
 
   protected:
-    void skip_whitespace();
     void skip_line();
     bool read_line(line_type term_count, std::unique_ptr<rdf::term> terms[]);
     std::size_t read_term(std::unique_ptr<rdf::term>& term);
@@ -75,15 +74,6 @@ implementation::implementation(FILE* const stream,
 }
 
 implementation::~implementation() noexcept {};
-
-void
-implementation::skip_whitespace() {
-  // @see http://www.w3.org/TR/n-quads/#sec-grammar
-  char c;
-  while ((c = *_input) != '\0' && (c == ' ' || c == '\t')) {
-    _input++; /* skip any whitespace characters */
-  }
-}
 
 void
 implementation::skip_line() {
@@ -298,19 +288,25 @@ read_next_line:
   if (!std::fgets(_buffer.data(), _buffer.size(), _stream)) {
     return false;
   }
-
   _line++;
   _input = _buffer.data();
 
-  skip_whitespace();
-  if (*_input == '\0') {
-    return false;  /* empty input */
+skip_whitespace:
+  for (;;) {
+    switch ((c = *_input)) {
+      case '\t': case ' ': _input++; break;
+      case '\r': case '\n': goto read_next_line; /* EOL */
+      case '#':  goto read_next_line; /* comment */
+      case '\0': goto read_next_line; /* EOS */
+      default:   goto read_terms;
+    }
   }
 
+read_terms:
   std::unique_ptr<rdf::term> term;
   auto term_index = 0U;
   while (term_index < static_cast<decltype(term_index)>(term_count)) {
-    switch (*_input) {
+    switch ((c = *_input)) {
       case '<':    /* URI reference */
       case '_':    /* blank node */
       case '"': {  /* literal */
@@ -322,7 +318,7 @@ read_next_line:
       }
       case ' ':    /* whitespace */
       case '\t': {
-        skip_whitespace();
+        _input++;
         break;
       }
       case '#': {  /* comment */
@@ -342,23 +338,26 @@ read_next_line:
   }
 
 end_of_statement:
-  skip_whitespace();
-  if ((c = *_input++) != '.') {
-    throw std::invalid_argument{"expected end of statement"};
+  for (;;) {
+    switch ((c = *_input)) {
+      case '\t': case ' ': _input++; break;
+      case '.': _input++; goto end_of_line;
+      default: throw std::invalid_argument{"expected end of statement"};
+    }
   }
 
 end_of_line:
-  skip_whitespace();
-  if ((c = *_input++) != '\n' && c != '\r') {
-    throw std::invalid_argument{"expected end of line"};
-    // TODO: handle CRLFs correctly.
+  // @see http://www.w3.org/TR/n-quads/#grammar-production-EOL
+  for (;;) {
+    switch ((c = *_input)) {
+      case '\t': case ' ':  _input++; break;
+      case '\r': case '\n': _input++; goto end_of_input; // TODO: handle CRLFs correctly.
+      case '#': skip_line(); break;
+      default: throw std::invalid_argument{"expected end of line"};
+    }
   }
 
-#if 0
-end_of_string:
-  skip_whitespace();
-#endif
-
+end_of_input:
   return true;
 }
 
