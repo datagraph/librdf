@@ -6,14 +6,14 @@
 
 #include "nquads.h"
 #include "../quad.h"
+#include "../reader.h"
 #include "../term.h"
 #include "../triple.h"
 
-#include <cassert>   /* for assert() */
-#include <cstdio>    /* for FILE, std::f*() */
-#include <cctype>    /* for std::is*() */
-#include <cstring>   /* for std::strncpy() */
-#include <stdexcept> /* for std::invalid_argument */
+#include <cassert> /* for assert() */
+#include <cstdio>  /* for FILE, std::f*() */
+#include <cctype>  /* for std::is*() */
+#include <cstring> /* for std::strncpy() */
 
 #include <rfc/utf8.h>
 
@@ -51,6 +51,7 @@ namespace {
     std::size_t read_blank_node(std::unique_ptr<rdf::term>& term);
     std::size_t read_literal(std::unique_ptr<rdf::term>& term);
     std::size_t read_escaped_string(const char* _input, const char leading_delim, const char trailing_delim, const std::size_t min_length, std::string& result);
+    void throw_error(const char* description, const char* input = nullptr);
   };
 }
 
@@ -109,7 +110,7 @@ implementation::read_uri_reference(std::unique_ptr<rdf::term>& term) {
   input += read_escaped_string(_input, '<', '>', 1, string);
 
   if (string.empty()) {
-    throw std::invalid_argument{"empty URI reference"};
+    throw_error("empty URI reference", input - 2);
   }
 
   term.reset(new rdf::uri_reference{string});
@@ -122,27 +123,27 @@ implementation::read_blank_node(std::unique_ptr<rdf::term>& term) {
   const char* input = _input;
 
   if (*input++ != '_') { /* skip the leading '_' */
-    throw std::invalid_argument{"expected leading '_'"};
+    throw_error("expected leading '_'", input - 1);
   }
 
   if (*input++ != ':') { /* skip the leading ':' */
-    throw std::invalid_argument{"expected leading '_:'"};
+    throw_error("expected leading '_:'", input - 2);
   }
 
-  const char* label = input; /* the start of the label */
+  const char* marker = input; /* the start of the label */
 
   char c;
   while ((c = *input) != '\0' && !std::isspace(c)) { // TODO: restrict this per the grammar
     input++;
   }
 
-  const std::size_t length = input - label;
+  const std::size_t length = input - marker;
   if (length == 0) {
-    throw std::invalid_argument{"empty blank node label"};
+    throw_error("empty blank node label", marker);
   }
 
   char buffer[length + 1];
-  std::strncpy(buffer, label, sizeof(buffer) - 1);
+  std::strncpy(buffer, marker, sizeof(buffer) - 1);
   buffer[sizeof(buffer) - 1] = '\0';
 
   term.reset(new rdf::blank_node{buffer});
@@ -161,14 +162,14 @@ implementation::read_literal(std::unique_ptr<rdf::term>& term) {
   switch (*input) {
     case '@': { /* a language-tagged literal */
       input++;  /* skip the '@' character */
-      const char* language = input;
+      const char* marker = input;
 
       while (std::isalpha(*input)) { // [a-zA-Z]+
         input++;
       }
 
-      if (input == language) {
-        throw std::invalid_argument{"invalid language tag"};
+      if (input == marker) {
+        throw_error("invalid language tag", marker);
       }
 
       while (*input == '-') {  // ('-' [a-zA-Z0-9]+)*
@@ -178,13 +179,13 @@ implementation::read_literal(std::unique_ptr<rdf::term>& term) {
         }
       }
 
-      const std::size_t length = input - language;
-      if (length >= 42) { // @see http://tools.ietf.org/html/rfc5646#section-4.4.1
-        throw std::invalid_argument{"oversized language tag"};
+      const std::size_t length = input - marker;
+      if (length > 42) { // @see http://tools.ietf.org/html/rfc5646#section-4.4.1
+        throw_error("oversized language tag (> 42 characters)", marker);
       }
 
       char buffer[length + 1];
-      std::strncpy(buffer, language, sizeof(buffer) - 1);
+      std::strncpy(buffer, marker, sizeof(buffer) - 1);
       buffer[sizeof(buffer) - 1] = '\0';
 
       term.reset(new rdf::plain_literal{string.c_str(), buffer});
@@ -194,7 +195,7 @@ implementation::read_literal(std::unique_ptr<rdf::term>& term) {
     case '^': { /* a datatyped literal */
       input++;               /* skip the first '^' character */
       if (*input++ != '^') { /* skip the second '^' character */
-        throw std::invalid_argument{"invalid datatype specifier"};
+        throw_error("invalid datatype specifier", input - 2);
       }
 
       std::string datatype_uri;
@@ -222,18 +223,19 @@ implementation::read_escaped_string(const char* _input,
   const char* input = _input;
 
   if (*input++ != leading_delim) { /* skip the leading delimiter */
-    throw std::invalid_argument{"expected leading delimiter"};
+    throw_error("expected leading delimiter", input - 1);
   }
 
   for (;;) {
+    const char* const marker = input; /* for errors */
     char c = *input++;
 
     if (c == '\0') {
-      throw std::invalid_argument{"unterminated term literal"};
+      throw_error("unterminated term literal", marker);
     }
     else if (c == trailing_delim) {
       if (result.size() < min_length) {
-        throw std::invalid_argument{"term is shorter than minimum length"};
+        throw_error("term is shorter than minimum length", marker);
       }
       break;
     }
@@ -253,13 +255,13 @@ implementation::read_escaped_string(const char* _input,
           const auto ulen = (c == 'u') ? 4U : 8U;
           for (auto i = 0U; i < ulen; i++) {
             if (!std::isxdigit(ubuf[i] = *input++)) {
-              throw std::invalid_argument{"invalid \\u or \\U escape sequence"};
+              throw_error("invalid \\u or \\U escape sequence", marker);
             }
           }
           ubuf[ulen] = '\0';
           long u;
           if ((u = std::strtol(ubuf, nullptr, 16)) == 0) {
-            throw std::invalid_argument{"invalid \\u or \\U escape sequence"};
+            throw_error("invalid \\u or \\U escape sequence", marker);
           }
           char buffer[5] = {0, 0, 0, 0, 0};
           utf8_encode(u, buffer); // FIXME?
@@ -267,14 +269,14 @@ implementation::read_escaped_string(const char* _input,
           break;
         }
         default:
-          throw std::invalid_argument{"invalid escape character"};
+          throw_error("invalid escape character", marker);
       }
     }
     else if (true) { // TODO: grammar restrictions
       result.push_back(c);
     }
     else {
-      throw std::invalid_argument{"invalid character"};
+      throw_error("invalid character", marker);
     }
   }
 
@@ -294,7 +296,7 @@ read_next_line:
   _line++;
   _input = _buffer.data();
 
-skip_whitespace:
+//skip_whitespace:
   for (;;) {
     switch ((c = *_input)) {
       case '\t': case ' ': _input++; break;
@@ -332,10 +334,10 @@ read_terms:
         if (term_index >= 3) {
           goto end_of_statement;
         }
-        throw std::invalid_argument{"premature end of statement"};
+        throw_error("premature end of statement", _input);
       }
       default: {
-        throw std::invalid_argument{"invalid input"};
+        throw_error("invalid input", _input);
       }
     }
   }
@@ -345,7 +347,7 @@ end_of_statement:
     switch ((c = *_input)) {
       case '\t': case ' ': _input++; break;
       case '.': _input++; goto end_of_line;
-      default: throw std::invalid_argument{"expected end of statement"};
+      default: throw_error("expected end of statement", _input);
     }
   }
 
@@ -356,7 +358,7 @@ end_of_line:
       case '\t': case ' ':  _input++; break;
       case '\r': case '\n': _input++; goto end_of_input; // TODO: handle CRLFs correctly.
       case '#': skip_line(); break;
-      default: throw std::invalid_argument{"expected end of line"};
+      default: throw_error("expected end of line", _input);
     }
   }
 
@@ -388,3 +390,9 @@ implementation::read_quads(std::function<void (std::unique_ptr<rdf::quad>)> call
 
 void
 implementation::abort() {}
+
+void
+implementation::throw_error(const char* const description,
+                            const char* const input) {
+  throw rdf::reader_error{description, _line, input ? (input - _buffer.data()) + 1UL : 0UL};
+}

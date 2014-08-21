@@ -22,25 +22,38 @@ namespace rdf {
  * RDF parser error.
  */
 class rdf::reader_error : public std::runtime_error {
+protected:
+  const std::size_t _line {0};
+  const std::size_t _column {0};
+
 public:
-  reader_error(const char* what)
-    : std::runtime_error(what) {}
+  reader_error(const char* const what)
+    : std::runtime_error{what} {}
 
-  reader_error(const char* what, std::size_t line, std::size_t column = 0)
-    : std::runtime_error(what),
-      _line(line),
-      _column(column) {}
+  reader_error(const char* const what,
+               const std::size_t line,
+               const std::size_t column = 0)
+    : std::runtime_error{what},
+      _line{line},
+      _column{column} {}
 
-  inline std::size_t line_number() const noexcept {
+  /**
+   * Returns the line number, if any, that this error relates to.
+   *
+   * @return nonzero if a line number is indicated, zero otherwise
+   */
+  std::size_t line_number() const noexcept {
     return _line;
   }
 
-  inline std::size_t column_number() const noexcept {
+  /**
+   * Returns the column number, if any, that this error relates to.
+   *
+   * @return nonzero if a column number is indicated, zero otherwise
+   */
+  std::size_t column_number() const noexcept {
     return _column;
   }
-
-protected:
-  std::size_t _line = 0, _column = 0;
 };
 
 /**
