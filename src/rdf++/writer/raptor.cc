@@ -12,6 +12,8 @@
 #include "../triple.h"
 
 #include <cassert>    /* for assert() */
+#include <cstdio>     /* for std::fprintf() */
+#include <cstring>    /* for std::strcmp() */
 #include <functional> /* for std::function */
 #include <new>        /* for std::bad_alloc */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
@@ -26,6 +28,7 @@ namespace {
       const char* base_uri);
     virtual ~implementation() noexcept override;
     virtual void configure(const char* key, const char* value) override;
+    virtual void define_prefix(const char* prefix, const char* uri_string) override;
     virtual void begin() override;
     virtual void finish() override;
     virtual void write_triple(const rdf::triple& triple) override;
@@ -71,7 +74,7 @@ implementation::log_callback(void* const user_data,
   //assert(writer_impl != nullptr);
   assert(message != nullptr);
 
-  fprintf(stderr, "implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
+  std::fprintf(stderr, "implementation::log_callback(%p, %p): %s\n", user_data, message, message->text);
 }
 
 implementation::implementation(FILE* const stream,
@@ -103,7 +106,7 @@ implementation::initialize(const char* const base_uri,
   raptor_world_set_log_handler(_world, this, implementation::log_callback);
   raptor_world_open(_world);
 
-  _base_uri = raptor_new_uri(_world, (const unsigned char*)base_uri);
+  _base_uri = raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(base_uri));
   if (_base_uri == nullptr) {
     raptor_free_world(_world), _world = nullptr;
     throw std::bad_alloc(); /* out of memory */
@@ -159,7 +162,23 @@ implementation::~implementation() noexcept {
 void
 implementation::configure(const char* const key,
                           const char* const value) {
-  (void)key, (void)value; // TODO
+  // TODO
+  static_cast<void>(key);
+  static_cast<void>(value);
+}
+
+void
+implementation::define_prefix(const char* const prefix,
+                              const char* const uri_string) {
+  if (std::strcmp(prefix, "rdf") == 0) {
+    return; /* raptor_serializer_set_namespace() rejects the 'rdf' namespace */
+  }
+  const int rc = raptor_serializer_set_namespace(_serializer,
+    raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(uri_string)),
+    reinterpret_cast<const unsigned char*>(prefix));
+  if (rc != 0) {
+    throw std::runtime_error("raptor_serializer_set_namespace() failed");
+  }
 }
 
 void

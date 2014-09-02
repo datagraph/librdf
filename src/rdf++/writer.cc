@@ -139,10 +139,10 @@ writer::configure(const char* const key,
 }
 
 void
-writer::define_prefix(const std::string& prefix,
-                      const std::string& uri_string) {
+writer::define_prefix(const char* prefix,
+                      const char* uri_string) {
   assert(_implementation);
-  (void)prefix, (void)uri_string; // TODO
+  _implementation->define_prefix(prefix, uri_string);
 }
 
 void

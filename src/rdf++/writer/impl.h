@@ -17,7 +17,13 @@ public:
   virtual ~implementation() noexcept {}
 
   virtual void configure(const char* key, const char* value) {
-    (void)key, (void)value;
+    static_cast<void>(key);
+    static_cast<void>(value);
+  }
+
+  virtual void define_prefix(const char* prefix, const char* uri_string) {
+    static_cast<void>(prefix);
+    static_cast<void>(uri_string);
   }
 
   virtual void begin() {}

@@ -93,7 +93,11 @@ public:
   void configure(const char* key, const char* value);
 
   void define_prefix(const std::string& prefix,
-                     const std::string& uri_string);
+                     const std::string& uri_string) {
+    define_prefix(prefix.c_str(), uri_string.c_str());
+  }
+
+  void define_prefix(const char* prefix, const char* uri_string);
 
   void begin();
 
