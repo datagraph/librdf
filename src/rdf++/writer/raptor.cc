@@ -16,6 +16,7 @@
 #include <cstring>    /* for std::strcmp() */
 #include <functional> /* for std::function */
 #include <new>        /* for std::bad_alloc */
+#include <set>        /* for std::set */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 
 #include <raptor2.h>  /* for raptor_*() */
@@ -42,11 +43,12 @@ namespace {
   private:
     const std::string _content_type;
     const std::string _charset;
-    raptor_world* _world = nullptr;
-    raptor_uri* _base_uri = nullptr;
-    raptor_iostream* _iostream = nullptr;
-    raptor_serializer* _serializer = nullptr;
-    raptor_statement* _statement = nullptr;
+    std::set<std::string> _prefix_uris;
+    raptor_world* _world {nullptr};
+    raptor_uri* _base_uri {nullptr};
+    raptor_iostream* _iostream {nullptr};
+    raptor_serializer* _serializer {nullptr};
+    raptor_statement* _statement {nullptr};
 
     void initialize(const char* base_uri, std::function<raptor_iostream* ()> make_raptor_iostream);
 
@@ -173,12 +175,16 @@ implementation::define_prefix(const char* const prefix,
   if (std::strcmp(prefix, "rdf") == 0) {
     return; /* raptor_serializer_set_namespace() rejects the 'rdf' namespace */
   }
+  if (_prefix_uris.count(uri_string)) {
+    return; /* raptor_serializer_set_namespace() rejects duplicate declarations */
+  }
   const int rc = raptor_serializer_set_namespace(_serializer,
     raptor_new_uri(_world, reinterpret_cast<const unsigned char*>(uri_string)),
     reinterpret_cast<const unsigned char*>(prefix));
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_set_namespace() failed");
   }
+  _prefix_uris.insert(uri_string);
 }
 
 void
@@ -187,6 +193,7 @@ implementation::begin() {
   if (rc != 0) {
     throw std::runtime_error("raptor_serializer_start_to_iostream() failed");
   }
+  _prefix_uris.clear(); /* no more prefix declarations permitted */
 }
 
 void
