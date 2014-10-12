@@ -15,7 +15,7 @@
 #include <cctype>  /* for std::is*() */
 #include <cstring> /* for std::strncpy() */
 
-#include <rfc/utf8.h>
+#include <rfc/utf8/utf8_encode.h>
 
 #define BUFFER_SIZE (1024UL*1024UL) /* 1 MiB */
 

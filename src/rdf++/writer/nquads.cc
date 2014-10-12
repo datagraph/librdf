@@ -12,10 +12,6 @@
 #include <cassert> /* for assert() */
 #include <cstdio>  /* for FILE, std::f*() */
 
-#include <rfc/utf8.h>
-
-using namespace rfc3629; /* for UTF-8 */
-
 namespace {
   class implementation final : public rdf::writer::implementation {
     FILE* _stream {nullptr};
