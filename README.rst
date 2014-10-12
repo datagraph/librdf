@@ -1,13 +1,17 @@
+********
 librdf++
-========
+********
 
 .. image:: https://travis-ci.org/datagraph/librdf.png?branch=master
    :target: https://travis-ci.org/datagraph/librdf
-   :align: right
    :alt: Travis CI build status
 
+.. image:: https://scan.coverity.com/projects/3233/badge.svg
+   :target: https://scan.coverity.com/projects/3233
+   :alt: Coverity Scan build status
+
 Build Prerequisites
--------------------
+===================
 
 * Clang_ (>= 3.0) or GCC_ (>= 4.7)
 * Autoconf_ (>= 2.68)
@@ -23,7 +27,7 @@ Build Prerequisites
 .. _pkg-config: http://pkg-config.freedesktop.org/
 
 Build Dependencies
-------------------
+==================
 
 * libraptor2_ (>= 2.0.6)
 * libxml2_ (>= 2.7.8), for the TriX format only
@@ -36,7 +40,7 @@ Build Dependencies
 .. _Boost.Utility: http://www.boost.org/libs/utility/
 
 Installation on Unix
---------------------
+====================
 
 ::
 
@@ -48,10 +52,12 @@ Installation on Unix
    $ sudo ldconfig                      # on Linux
 
 Elsewhere
----------
+=========
 
-Find the project at: GitHub_, Bitbucket_, and `Travis CI`_.
+Find the project at: GitHub_, Bitbucket_, `Travis CI`_, and `Coverity
+Scan`_.
 
-.. _GitHub:      http://github.com/datagraph/librdf
-.. _Bitbucket:   http://bitbucket.org/datagraph/librdf
-.. _Travis CI:   http://travis-ci.org/datagraph/librdf
+.. _GitHub:        http://github.com/datagraph/librdf
+.. _Bitbucket:     http://bitbucket.org/datagraph/librdf
+.. _Travis CI:     http://travis-ci.org/datagraph/librdf
+.. _Coverity Scan: http://scan.coverity.com/projects/3233

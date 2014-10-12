@@ -1,3 +1,4 @@
+# https://travis-ci.org/datagraph/librdf
 language: cpp
 compiler:
   - clang
@@ -12,7 +13,21 @@ before_install:
 before_script:
   - ./autogen.sh
 script:
-  - ./configure && make && make check
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./configure && make && make check; fi
 branches:
   only:
     - master
+    - coverity
+
+# https://scan.coverity.com/projects/3233
+env:
+  global:
+  - secure: "PwHNLygFY3pBOu2Hu4IH2RupJJBYwVr5UhPE13FFNIU2KQlpCQ1z+vDvYzfPbi2VMf9UzPwwYMQvTvvTxuKjozemDD0HM7hBRwmUkZhmjgmiJXlXLqtTwC3iuHw8hq7VLul+hqrevpYhL842f8DMtgUCtgRD4lCw+qnLH9FJ+1c="
+addons:
+  coverity_scan:
+    project:
+      name: datagraph/librdf
+    notification_email: arto@bendiken.net
+    build_command_prepend: cov-configure --comptype gcc --compiler $CC && ./configure
+    build_command: make
+    branch_pattern: coverity
