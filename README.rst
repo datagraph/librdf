@@ -2,7 +2,7 @@
 librdf++
 ********
 
-.. image:: https://travis-ci.org/datagraph/librdf.png?branch=master
+.. image:: https://api.travis-ci.org/datagraph/librdf.svg?branch=master
    :target: https://travis-ci.org/datagraph/librdf
    :alt: Travis CI build status
 
