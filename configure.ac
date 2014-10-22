@@ -87,19 +87,25 @@ AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 dnl Check for libraries:
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_rdfxml" != "xno" || test "x$enable_trig" != "xno" || test "x$enable_turtle" != "xno" || test "x$enable_xslt" != "xno"], [
-  PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
+  PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6],
+    [AC_DEFINE([HAVE_LIBRAPTOR2], [1], [Define to 1 if you have the libraptor2 shared library.])])
 ])
+AM_CONDITIONAL([HAVE_LIBRAPTOR2], [test "x$libraptor2_LIBS" != "x"])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_trix" != "xno"], [
-  PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])
+  PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8],
+    [AC_DEFINE([HAVE_LIBXML2], [1], [Define to 1 if you have the libxml2 shared library.])])
 ])
+AM_CONDITIONAL([HAVE_LIBXML2], [test "x$libxml2_LIBS" != "x"])
 # libxqilla (libxqilla-dev on Ubuntu, xqilla on Mac OS X + MacPorts)
 AS_IF([test "x$enable_xslt" != "xno"], [
   AC_CHECK_HEADERS([xqilla/xqilla-simple.hpp],
-    AC_SEARCH_LIBS([createXQillaXQCImplementation], [xqilla], [],
+    AC_SEARCH_LIBS([createXQillaXQCImplementation], [xqilla],
+      [AC_DEFINE([HAVE_LIBXQILLA], [1], [Define to 1 if you have the libxqilla shared library.])],
       AC_MSG_ERROR([*** Shared library libxqilla not found; install http://xqilla.sourceforge.net/ ***])),
     AC_MSG_ERROR([*** Header file <xqilla/xqilla-simple.hpp> not found; install http://xqilla.sourceforge.net/ ***]))
 ])
+AM_CONDITIONAL([HAVE_LIBXQILLA], [test "x$enable_xslt" != "xno" && test "x$ac_res" != "xno"])
 
 dnl Check for header files:
 
