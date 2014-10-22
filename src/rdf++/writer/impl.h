@@ -5,16 +5,40 @@
 
 #include "rdf++/writer.h"
 
-#include <boost/noncopyable.hpp>
-
 #include <cstddef> /* for std::size_t */
 
-struct rdf::writer::implementation : private boost::noncopyable {
+struct rdf::writer::implementation {
 protected:
-  implementation() noexcept {}
+  /**
+   * Default constructor.
+   */
+  implementation() noexcept = default;
 
 public:
-  virtual ~implementation() noexcept {}
+  /**
+   * Copy constructor.
+   */
+  implementation(const implementation& other) noexcept = delete;
+
+  /**
+   * Move constructor.
+   */
+  implementation(implementation&& other) noexcept = default;
+
+  /**
+   * Destructor.
+   */
+  virtual ~implementation() noexcept = default;
+
+  /**
+   * Copy assignment operator.
+   */
+  implementation& operator=(const implementation& other) noexcept = delete;
+
+  /**
+   * Move assignment operator.
+   */
+  implementation& operator=(implementation&& other) noexcept = default;
 
   virtual void configure(const char* key, const char* value) {
     static_cast<void>(key);
