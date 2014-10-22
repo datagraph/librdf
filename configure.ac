@@ -86,7 +86,9 @@ AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
-PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
+AS_IF([test "x$enable_rdfxml" != "xno" || test "x$enable_trig" != "xno" || test "x$enable_turtle" != "xno" || test "x$enable_xslt" != "xno"], [
+  PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6])
+])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_trix" != "xno"], [
   PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8])
