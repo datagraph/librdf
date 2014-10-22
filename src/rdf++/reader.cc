@@ -4,30 +4,30 @@
 #include <config.h>
 #endif
 
-#include "rdf++/reader.h"
-#include "rdf++/reader/impl.h"
+#include "reader.h"
+#include "reader/impl.h"
 
 #ifndef DISABLE_JSONLD
-#include "rdf++/reader/jsonld.h"
+#include "reader/jsonld.h"
 #endif
 
 #ifndef DISABLE_NQUADS
-#include "rdf++/reader/nquads.h"
-#endif
-
-#ifndef DISABLE_RAPTOR
-#include "rdf++/reader/raptor.h"
+#include "reader/nquads.h"
 #endif
 
 #ifndef DISABLE_TRIX
-#include "rdf++/reader/trix.h"
+#include "reader/trix.h"
 #endif
 
-#include "rdf++/format.h"
-#include "rdf++/quad.h"
-#include "rdf++/raptor.h"
-#include "rdf++/term.h"
-#include "rdf++/triple.h"
+#ifdef HAVE_LIBRAPTOR2
+#include "raptor.h"
+#include "reader/raptor.h"
+#endif
+
+#include "format.h"
+#include "quad.h"
+#include "term.h"
+#include "triple.h"
 
 #include <cassert>    /* for assert() */
 #include <cstring>    /* for std::strcmp() */
@@ -41,7 +41,7 @@ rdf_reader_for(FILE* stream,
                const char* const content_type = nullptr,
                const char* const charset = nullptr,
                const char* const base_uri = nullptr) {
-#ifndef DISABLE_RAPTOR
+#ifdef HAVE_LIBRAPTOR2
   /* Only the Raptor implementation supports content autodetection at the moment: */
   if (!content_type) {
     return rdf_reader_for_raptor(stream, content_type, charset, base_uri);
@@ -65,7 +65,7 @@ rdf_reader_for(FILE* stream,
   }
 #endif
 
-#ifndef DISABLE_RAPTOR
+#ifdef HAVE_LIBRAPTOR2
   if (std::strcmp("raptor", format->module_name) == 0) {
     return rdf_reader_for_raptor(stream, content_type, charset, base_uri);
   }

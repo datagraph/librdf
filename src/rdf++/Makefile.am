@@ -1,9 +1,6 @@
-AM_CPPFLAGS += $(libraptor2_CFLAGS)
-
 lib_LTLIBRARIES = librdf++.la
 
 librdf___la_LIBADD = $(top_srcdir)/lib/librfcjson.la
-librdf___la_LIBADD += $(libraptor2_LIBS)
 
 librdf___la_SOURCES =     \
   extern.cc               \
@@ -11,9 +8,7 @@ librdf___la_SOURCES =     \
   format.cc               \
   module.cc               \
   quad.cc                 \
-  raptor.cc               \
   reader.cc               \
-  reader/raptor.cc        \
   term.cc                 \
   triple.cc               \
   version.cc              \
@@ -41,20 +36,28 @@ if !DISABLE_NQUADS
   librdf___la_SOURCES += reader/nquads.cc writer/nquads.cc
 endif
 
-if !DISABLE_TURTLE
-  librdf___la_SOURCES += writer/raptor.cc
-endif
-
 if !DISABLE_RDFJSON
   librdf___la_SOURCES += writer/rdfjson.cc
 endif
 
 if !DISABLE_TRIX
-  AM_CPPFLAGS += $(libxml2_CFLAGS)
-  librdf___la_LIBADD += $(libxml2_LIBS)
   librdf___la_SOURCES += reader/trix.cc writer/trix.cc
 endif
 
 if !DISABLE_XSLT
   librdf___la_SOURCES += writer/xslt.cc
+endif
+
+if HAVE_LIBRAPTOR2
+  AM_CPPFLAGS += $(libraptor2_CFLAGS)
+  librdf___la_LIBADD += $(libraptor2_LIBS)
+  librdf___la_SOURCES += raptor.cc reader/raptor.cc writer/raptor.cc
+endif
+
+if HAVE_LIBXML2
+  AM_CPPFLAGS += $(libxml2_CFLAGS)
+  librdf___la_LIBADD += $(libxml2_LIBS)
+endif
+
+if HAVE_LIBXQILLA
 endif

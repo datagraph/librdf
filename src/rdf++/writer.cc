@@ -15,10 +15,6 @@
 #include "writer/nquads.h"
 #endif
 
-#ifndef DISABLE_RAPTOR
-#include "writer/raptor.h"
-#endif
-
 #ifndef DISABLE_RDFJSON
 #include "writer/rdfjson.h"
 #endif
@@ -31,9 +27,13 @@
 #include "writer/xslt.h"
 #endif
 
+#ifdef HAVE_LIBRAPTOR2
+#include "raptor.h"
+#include "writer/raptor.h"
+#endif
+
 #include "format.h"
 #include "quad.h"
-#include "raptor.h"
 #include "term.h"
 #include "triple.h"
 
@@ -67,7 +67,7 @@ rdf_writer_for(FILE* const stream,
   }
 #endif
 
-#ifndef DISABLE_RAPTOR
+#ifdef HAVE_LIBRAPTOR2
   if (std::strcmp("raptor", format->module_name) == 0) {
     return rdf_writer_for_raptor(stream, content_type, charset, base_uri);
   }
