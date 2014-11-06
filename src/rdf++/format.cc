@@ -61,6 +61,10 @@ static const format rdf_format_info[] = {
 #ifndef DISABLE_XSLT
   {"application/xml",       nullptr, "xml",    "xslt",   nullptr,  nullptr},
 #endif
+#ifndef DISABLE_PAJEK
+  /* Pajek (.net) */
+  {"application/x-pajek",   nullptr, "net",    "pajek",  nullptr,  nullptr},
+#endif
 #if 1
   /* Graphviz (.dot) */
   {"text/x-graphviz",       nullptr, "dot",    "raptor", nullptr, "dot"},

@@ -15,6 +15,10 @@
 #include "writer/nquads.h"
 #endif
 
+#ifndef DISABLE_PAJEK
+#include "writer/pajek.h"
+#endif
+
 #ifndef DISABLE_RDFJSON
 #include "writer/rdfjson.h"
 #endif
@@ -70,6 +74,12 @@ rdf_writer_for(FILE* const stream,
 #ifdef HAVE_LIBRAPTOR2
   if (std::strcmp("raptor", format->module_name) == 0) {
     return rdf_writer_for_raptor(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_PAJEK
+  if (std::strcmp("pajek", format->module_name) == 0) {
+    return rdf_writer_for_pajek(stream, content_type, charset, base_uri);
   }
 #endif
 

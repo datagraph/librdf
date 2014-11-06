@@ -36,6 +36,10 @@ if !DISABLE_NQUADS
   librdf___la_SOURCES += reader/nquads.cc writer/nquads.cc
 endif
 
+if !DISABLE_PAJEK
+  librdf___la_SOURCES += writer/pajek.cc
+endif
+
 if !DISABLE_RDFJSON
   librdf___la_SOURCES += writer/rdfjson.cc
 endif
