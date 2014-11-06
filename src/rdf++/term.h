@@ -56,19 +56,23 @@ public:
 
   virtual term* clone() const = 0;
 
-  inline bool is_uri_reference() const {
+  bool is_uri_reference() const noexcept {
     return type == term_type::uri_reference;
   }
 
-  inline bool is_blank_node() const {
+  bool is_blank_node() const noexcept {
     return type == term_type::blank_node;
   }
 
-  inline bool is_plain_literal() const {
+  bool is_literal() const noexcept {
+    return is_plain_literal() || is_typed_literal();
+  }
+
+  bool is_plain_literal() const noexcept {
     return type == term_type::plain_literal;
   }
 
-  inline bool is_typed_literal() const {
+  bool is_typed_literal() const noexcept {
     return type == term_type::typed_literal;
   }
 
