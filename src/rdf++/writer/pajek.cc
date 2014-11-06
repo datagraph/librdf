@@ -78,7 +78,7 @@ implementation::finish() {
     std::fprintf(_stream, "%lu \"%s\"\n", element.second, element.first.c_str()); // TODO: escaping
   }
 
-  std::fprintf(_stream, "*%s\n", "Edges");
+  std::fprintf(_stream, "*%s\n", "Arcs");
   for (const auto& element : _edges) {
     std::fprintf(_stream, "%lu %lu\n", element.first, element.second);
   }
