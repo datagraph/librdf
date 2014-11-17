@@ -1,1 +1,6 @@
 - Implement fmemopen() for Mac OS X based on funopen().
+
+FreeBSD
+-------
+
+- clang++: warning: argument unused during compilation: '-pthread'

@@ -10,6 +10,7 @@
 #include "../term.h"
 #include "../triple.h"
 
+#include <array>   /* for std::array */
 #include <cassert> /* for assert() */
 #include <cstdio>  /* for FILE, std::f*() */
 #include <cctype>  /* for std::is*() */
