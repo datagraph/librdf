@@ -13,9 +13,13 @@
 
 using namespace rdf;
 
-extern const term* const rdf::default_context = nullptr;
+////////////////////////////////////////////////////////////////////////////////
+
+extern const term* const rdf::default_context{nullptr};
 
 static std::random_device random_uint;
+
+////////////////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<term>
 term::create(const term_type type,
@@ -43,8 +47,17 @@ term::create(const term_type type,
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+std::size_t
+uri_reference::size() const {
+  return 0; // TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 blank_node::blank_node()
-  : clonable_term<blank_node>(term_type::blank_node) {
+  : clonable_term<blank_node>{term_type::blank_node} {
 
   using clock = std::chrono::steady_clock; /* a monotonic clock */
   using precision = std::chrono::microseconds;
@@ -57,4 +70,23 @@ blank_node::blank_node()
   std::sprintf(buffer, "g%016zu%03u", static_cast<std::size_t>(prefix), suffix % 1000);
 
   string.assign(buffer);
+}
+
+std::size_t
+blank_node::size() const {
+  return 0; // TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::size_t
+plain_literal::size() const {
+  return 0; // TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::size_t
+typed_literal::size() const {
+  return 0; // TODO
 }
