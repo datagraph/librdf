@@ -53,6 +53,10 @@ AC_ARG_WITH([stdlib],
 AS_IF([test "x$with_stdlib" != "xsystem"],
   [CXXFLAGS="$CXXFLAGS -stdlib=$with_stdlib"
    LDFLAGS="$LDFLAGS -stdlib=$with_stdlib"])
+# --with-serd/--without-serd
+AC_ARG_WITH([serd],
+  [AS_HELP_STRING([--with-serd], [use the Serd library to parse Turtle @<:@default=check@:>@])],
+  [], [with_serd=check])
 # --enable-debug/--disable-debug
 AC_ARG_ENABLE([debug],
   [AS_HELP_STRING([--enable-debug], [build with debugging support [default=no]])],
@@ -86,6 +90,12 @@ AX_ARG_ENABLE_FORMAT([turtle],  [Turtle])   # --enable-turtle/--disable-turtle
 AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
+# libserd-0 (libserd-0-0 on Ubuntu, serd on Mac OS X + MacPorts)
+AS_IF([test "x$with_serd" != "xno"], [
+  PKG_CHECK_MODULES([libserd], [serd-0 >= 0.20],
+    [AC_DEFINE([HAVE_SERD], [1], [Define to 1 if you have the libserd shared library.])])
+])
+AM_CONDITIONAL([HAVE_SERD], [test "x$libserd_LIBS" != "x"])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_rdfxml" != "xno" || test "x$enable_trig" != "xno" || test "x$enable_turtle" != "xno" || test "x$enable_xslt" != "xno"], [
   PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6],
