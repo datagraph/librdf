@@ -24,6 +24,10 @@
 #include "reader/raptor.h"
 #endif
 
+#ifdef HAVE_LIBSERD
+#include "reader/serd.h"
+#endif
+
 #include "format.h"
 #include "quad.h"
 #include "term.h"
@@ -49,7 +53,7 @@ rdf_reader_for(FILE* stream,
 #endif
 
   const format* const format = format::find_for_content_type(content_type);
-  if (format == nullptr) {
+  if (!format) {
     return nullptr; /* unknown content type */
   }
 
@@ -71,6 +75,12 @@ rdf_reader_for(FILE* stream,
   }
 #endif
 
+#ifdef HAVE_LIBSERD
+  if (std::strcmp("serd", format->module_name) == 0) {
+    return rdf_reader_for_serd(stream, content_type, charset, base_uri);
+  }
+#endif
+
 #ifndef DISABLE_TRIX
   if (std::strcmp("trix", format->module_name) == 0) {
     return rdf_reader_for_trix(stream, content_type, charset, base_uri);
@@ -78,6 +88,7 @@ rdf_reader_for(FILE* stream,
 #endif
 
   (void)stream, (void)charset, (void)base_uri;
+  assert(false && "inconsistent content type definitions");
   return nullptr; /* no implementation available */
 }
 

@@ -58,6 +58,12 @@ if HAVE_LIBRAPTOR2
   librdf___la_SOURCES += raptor.cc reader/raptor.cc writer/raptor.cc
 endif
 
+if HAVE_LIBSERD
+  AM_CPPFLAGS += $(libserd_CFLAGS)
+  librdf___la_LIBADD += $(libserd_LIBS)
+  librdf___la_SOURCES += reader/serd.cc
+endif
+
 if HAVE_LIBXML2
   AM_CPPFLAGS += $(libxml2_CFLAGS)
   librdf___la_LIBADD += $(libxml2_LIBS)

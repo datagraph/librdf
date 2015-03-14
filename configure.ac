@@ -93,9 +93,9 @@ dnl Check for libraries:
 # libserd-0 (libserd-0-0 on Ubuntu, serd on Mac OS X + MacPorts)
 AS_IF([test "x$with_serd" != "xno"], [
   PKG_CHECK_MODULES([libserd], [serd-0 >= 0.20],
-    [AC_DEFINE([HAVE_SERD], [1], [Define to 1 if you have the libserd shared library.])])
+    [AC_DEFINE([HAVE_LIBSERD], [1], [Define to 1 if you have the libserd shared library.])])
 ])
-AM_CONDITIONAL([HAVE_SERD], [test "x$libserd_LIBS" != "x"])
+AM_CONDITIONAL([HAVE_LIBSERD], [test "x$libserd_LIBS" != "x"])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_rdfxml" != "xno" || test "x$enable_trig" != "xno" || test "x$enable_turtle" != "xno" || test "x$enable_xslt" != "xno"], [
   PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6],

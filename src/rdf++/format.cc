@@ -29,6 +29,9 @@ static const format rdf_format_info[] = {
   {"text/turtle",           nullptr, "ttl",    "raptor", "turtle", "turtle"},          /* official */
   {"application/turtle",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
   {"application/x-turtle",  nullptr, nullptr,  "raptor", "turtle", "turtle"},          /* unofficial, deprecated */
+#ifdef HAVE_LIBSERD
+  {"text/turtle;serd",      nullptr, nullptr,  "serd",   "turtle", "turtle"},
+#endif
   /* Notation3 (.n3) */
   {"text/n3",               nullptr, "n3",     "raptor", "turtle", "turtle"},          /* official */
   {"text/rdf+n3",           nullptr, nullptr,  "raptor", "turtle", "turtle"},
