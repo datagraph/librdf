@@ -25,6 +25,10 @@ namespace rdf {
     }
 
     static const format* find_for_content_type(const char* content_type);
+
+    static const format* find_for_file_extension(const char* file_extension);
+
+    static const format* find_for_file_path(const char* file_path);
   };
 }
 

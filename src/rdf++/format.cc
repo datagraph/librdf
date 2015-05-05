@@ -82,17 +82,12 @@ static const format rdf_format_info[] = {
   {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
 };
 
-static const unsigned int rdf_format_count =
-  (sizeof(rdf_format_info) / sizeof(rdf_format_info[0])) - 1;
-
 bool
 format::supported(const char* const content_type) {
   if (content_type != nullptr) {
-    for (unsigned int i = 0; i < rdf_format_count; i++) {
-      const format* const format_info = &rdf_format_info[i];
-      assert(format_info->content_type != nullptr);
-
-      if (std::strcmp(content_type, format_info->content_type) == 0) {
+    for (const auto& format_info : rdf_format_info) {
+      assert(format_info.content_type != nullptr);
+      if (std::strcmp(content_type, format_info.content_type) == 0) {
         return true; /* found */
       }
     }
@@ -105,14 +100,33 @@ const format*
 format::find_for_content_type(const char* const content_type) {
   assert(content_type != nullptr);
 
-  for (unsigned int i = 0; i < rdf_format_count; i++) {
-    const format* const format_info = &rdf_format_info[i];
-    assert(format_info->content_type != nullptr);
-
-    if (std::strcmp(content_type, format_info->content_type) == 0) {
-      return format_info;
+  for (const auto& format_info : rdf_format_info) {
+    assert(format_info.content_type != nullptr);
+    if (std::strcmp(content_type, format_info.content_type) == 0) {
+      return &format_info;
     }
   }
 
   return nullptr; /* not found */
+}
+
+const format*
+format::find_for_file_extension(const char* const file_extension) {
+  assert(file_extension != nullptr);
+
+  for (const auto& format_info : rdf_format_info) {
+    assert(format_info.file_extension != nullptr);
+    if (std::strcmp(file_extension, format_info.file_extension) == 0) {
+      return &format_info;
+    }
+  }
+
+  return nullptr; /* not found */
+}
+
+const format*
+format::find_for_file_path(const char* const file_path) {
+  assert(file_path != nullptr);
+
+  return find_for_file_extension(nullptr); // TODO
 }
