@@ -5,6 +5,8 @@
 
 #include <string> /* for std::string */
 
+////////////////////////////////////////////////////////////////////////////////
+
 namespace rdf {
   struct format {
     const char* const content_type;
@@ -26,10 +28,20 @@ namespace rdf {
 
     static const format* find_for_content_type(const char* content_type);
 
+    static const format* find_for_file_extension(const std::string& file_extension) {
+      return find_for_file_extension(file_extension.c_str());
+    }
+
     static const format* find_for_file_extension(const char* file_extension);
+
+    static const format* find_for_file_path(const std::string& file_path) {
+      return find_for_file_path(file_path.c_str());
+    }
 
     static const format* find_for_file_path(const char* file_path);
   };
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 #endif /* RDFXX_FORMAT_H */

@@ -7,9 +7,11 @@
 #include "rdf++/format.h"
 
 #include <cassert> /* for assert() */
-#include <cstring> /* for std::strcmp() */
+#include <cstring> /* for std::strcmp(), std::strrchr() */
 
 using namespace rdf;
+
+////////////////////////////////////////////////////////////////////////////////
 
 /* @see http://librdf.org/raptor/api/raptor-formats-types-by-serializer.html */
 static const format rdf_format_info[] = {
@@ -82,6 +84,8 @@ static const format rdf_format_info[] = {
   {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool
 format::supported(const char* const content_type) {
   if (content_type != nullptr) {
@@ -115,8 +119,8 @@ format::find_for_file_extension(const char* const file_extension) {
   assert(file_extension != nullptr);
 
   for (const auto& format_info : rdf_format_info) {
-    assert(format_info.file_extension != nullptr);
-    if (std::strcmp(file_extension, format_info.file_extension) == 0) {
+    if (format_info.file_extension &&
+        std::strcmp(file_extension, format_info.file_extension) == 0) {
       return &format_info;
     }
   }
@@ -128,5 +132,10 @@ const format*
 format::find_for_file_path(const char* const file_path) {
   assert(file_path != nullptr);
 
-  return find_for_file_extension(nullptr); // TODO
+  const char* const file_ending = std::strrchr(file_path, '.');
+  if (!file_ending) {
+    return nullptr; /* no file extension */
+  }
+
+  return find_for_file_extension(file_ending + 1);
 }
