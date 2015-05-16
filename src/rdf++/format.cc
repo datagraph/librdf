@@ -81,7 +81,6 @@ static const format rdf_format_info[] = {
   /* Atom (.xml) */
   {"application/atom+xml",  nullptr, nullptr,  "raptor", "rss-tag-soup", "atom"},
 #endif
-  {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
 };
 
 ////////////////////////////////////////////////////////////////////////////////
