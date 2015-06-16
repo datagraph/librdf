@@ -38,6 +38,7 @@
 #include <functional> /* for std::function */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 #include <cerrno>     /* for errno */
+#include <cstdio>     /* for std::sprintf() */
 
 using namespace rdf;
 
@@ -98,10 +99,15 @@ reader::reader(const std::string& file_path,
                const std::string& charset,
                const std::string& base_uri)
   : _implementation(nullptr) {
+
   FILE *fin = fopen(file_path.c_str(), "r");
+
   if (fin == nullptr) {
-    throw std::invalid_argument("unable to open file " + file_path + " " + strerror(errno));
+    char buffer[1024];
+    std::snprintf(buffer, 1024, "unable to open file %s %s", file_path.c_str(), strerror(errno));
+    throw std::invalid_argument(buffer);
   }
+
   _implementation = std::unique_ptr<implementation>(rdf_reader_for(fin, content_type.c_str(),
                                                                    charset.c_str(), base_uri.c_str()));
   if (!_implementation) {
