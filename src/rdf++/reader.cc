@@ -38,7 +38,7 @@
 #include <functional> /* for std::function */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 #include <cerrno>     /* for errno */
-#include <cstdio>     /* for std::sprintf() */
+#include <cstdio>     /* for std::snprintf() */
 
 using namespace rdf;
 
