@@ -34,7 +34,8 @@
 #include "triple.h"
 
 #include <cassert>    /* for assert() */
-#include <cstring>    /* for std::strcmp() */
+#include <cstdio>     /* for std::fopen() */
+#include <cstring>    /* for std::strcmp(), std::strerror() */
 #include <functional> /* for std::function */
 #include <stdexcept>  /* for std::invalid_argument, std::runtime_error */
 #include <cerrno>     /* for errno */
@@ -43,7 +44,7 @@
 using namespace rdf;
 
 static rdf::reader::implementation*
-rdf_reader_for(FILE* stream,
+rdf_reader_for(FILE* const stream,
                const char* const content_type = nullptr,
                const char* const charset = nullptr,
                const char* const base_uri = nullptr) {
@@ -98,35 +99,41 @@ reader::reader(const std::string& file_path,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(nullptr) {
+  : _implementation{nullptr} {
 
-  FILE *fin = fopen(file_path.c_str(), "r");
+  FILE* const stream = std::fopen(file_path.c_str(), "r");
 
-  if (fin == nullptr) {
-    char buffer[1024];
-    std::snprintf(buffer, 1024, "unable to open file %s %s", file_path.c_str(), strerror(errno));
-    throw std::invalid_argument(buffer);
+  if (!stream) {
+    char error_message[1024];
+    std::snprintf(error_message, sizeof(error_message),
+      "failed to open '%s': %s", file_path.c_str(), std::strerror(errno));
+    throw std::invalid_argument{error_message};
   }
 
-  _implementation = std::unique_ptr<implementation>(rdf_reader_for(fin, content_type.c_str(),
-                                                                   charset.c_str(), base_uri.c_str()));
+  _implementation.reset(rdf_reader_for(stream, content_type.c_str(), charset.c_str(), base_uri.c_str()));
+
   if (!_implementation) {
-    throw std::invalid_argument("unknown content type: " + content_type);
+    char error_message[1024];
+    std::snprintf(error_message, sizeof(error_message),
+      "unknown content type: %s", content_type.c_str());
+    throw std::invalid_argument{error_message};
   }
 }
 
-reader::reader(std::istream& stream,
-               const std::string& content_type,
-               const std::string& charset,
-               const std::string& base_uri)
-  : _implementation(nullptr) {
-  (void)stream, (void)content_type, (void)charset, (void)base_uri; // TODO
+reader::reader(std::istream& /*stream*/,
+               const std::string& /*content_type*/,
+               const std::string& /*charset*/,
+               const std::string& /*base_uri*/)
+  : _implementation{nullptr} {
+
+  // TODO
 }
 
 reader::reader(FILE* const stream)
-  : _implementation(rdf_reader_for(stream)) {
+  : _implementation{rdf_reader_for(stream)} {
+
   if (!_implementation) {
-    throw std::invalid_argument("unable to guess the input content type");
+    throw std::invalid_argument{"unable to guess the input content type"};
   }
 }
 
@@ -134,9 +141,13 @@ reader::reader(FILE* const stream,
                const std::string& content_type,
                const std::string& charset,
                const std::string& base_uri)
-  : _implementation(rdf_reader_for(stream, content_type.c_str(), charset.c_str(), base_uri.c_str())) {
+  : _implementation{rdf_reader_for(stream, content_type.c_str(), charset.c_str(), base_uri.c_str())} {
+
   if (!_implementation) {
-    throw std::invalid_argument("unknown content type: " + content_type);
+    char error_message[1024];
+    std::snprintf(error_message, sizeof(error_message),
+      "unknown content type: %s", content_type.c_str());
+    throw std::invalid_argument{error_message};
   }
 }
 
