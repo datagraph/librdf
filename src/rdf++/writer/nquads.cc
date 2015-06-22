@@ -5,16 +5,21 @@
 #endif
 
 #include "nquads.h"
+#include "../format.h"
 #include "../quad.h"
 #include "../term.h"
 #include "../triple.h"
 
 #include <cassert> /* for assert() */
 #include <cstdio>  /* for FILE, std::f*() */
+#include <cstring> /* for std::strcmp() */
+
+////////////////////////////////////////////////////////////////////////////////
 
 namespace {
   class implementation final : public rdf::writer::implementation {
     FILE* _stream {nullptr};
+    bool _ntriples{false};
 
   public:
     implementation(FILE* stream,
@@ -37,6 +42,8 @@ namespace {
   };
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 rdf::writer::implementation*
 rdf_writer_for_nquads(FILE* const stream,
                       const char* const content_type,
@@ -45,24 +52,31 @@ rdf_writer_for_nquads(FILE* const stream,
   return new implementation(stream, content_type, charset, base_uri);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 implementation::implementation(FILE* const stream,
                                const char* const content_type,
-                               const char* const charset,
-                               const char* const base_uri)
+                               const char* const /*charset*/,
+                               const char* const /*base_uri*/)
   : _stream{stream} {
   assert(stream != nullptr);
-  static_cast<void>(content_type); /* unused */
-  static_cast<void>(charset);      /* unused */
-  static_cast<void>(base_uri);     /* unused */
+
+  const rdf::format* const format = rdf::format::find_for_content_type(content_type);
+  assert(format);
+
+  if (std::strcmp(format->serializer_name, "ntriples") == 0) {
+    _ntriples = true;
+  }
 }
 
 implementation::~implementation() noexcept {}
 
+////////////////////////////////////////////////////////////////////////////////
+
 void
-implementation::configure(const char* const key,
-                          const char* const value) {
-  static_cast<void>(key);   /* unused */
-  static_cast<void>(value); /* unused */
+implementation::configure(const char* const /*key*/,
+                          const char* const /*value*/) {
+  /* no configuration parameters supported at present */
 }
 
 void
@@ -102,7 +116,7 @@ implementation::write_quad(const rdf::quad& quad) {
   write_term(*quad.object);
   std::fputc(' ', _stream);
 
-  if (quad.context) {
+  if (quad.context && !_ntriples) {
     write_term(*quad.context);
     std::fputc(' ', _stream);
   }
