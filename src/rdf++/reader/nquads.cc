@@ -369,23 +369,25 @@ end_of_input:
 
 void
 implementation::read_triples(std::function<void (std::unique_ptr<rdf::triple>)> callback) {
-  std::unique_ptr<rdf::term> terms[3] {nullptr, nullptr, nullptr};
+  std::unique_ptr<rdf::term> terms[3]{nullptr, nullptr, nullptr};
 
   while (read_line(line_type::ntriples, terms)) {
     auto triple = new rdf::triple{*terms[0].get(), *terms[1].get(), *terms[2].get()}; /* clones all terms */
     callback(std::unique_ptr<rdf::triple>{triple});
+    for (auto& term : terms) { term.reset(); }
   }
 }
 
 void
 implementation::read_quads(std::function<void (std::unique_ptr<rdf::quad>)> callback) {
-  std::unique_ptr<rdf::term> terms[4] {nullptr, nullptr, nullptr, nullptr};
+  std::unique_ptr<rdf::term> terms[4]{nullptr, nullptr, nullptr, nullptr};
 
   while (read_line(line_type::nquads, terms)) {
     auto quad = terms[3] ? /* clones all terms */
       new rdf::quad{*terms[0].get(), *terms[1].get(), *terms[2].get(), *terms[3].get()} :
       new rdf::quad{*terms[0].get(), *terms[1].get(), *terms[2].get()};
     callback(std::unique_ptr<rdf::quad>{quad});
+    for (auto& term : terms) { term.reset(); }
   }
 }
 
