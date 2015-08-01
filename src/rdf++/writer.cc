@@ -59,6 +59,10 @@ rdf_writer_for(FILE* const stream,
   }
   assert(format->module_name != nullptr);
 
+  if (std::strcmp("text/turtle", content_type) == 0) { // FIXME
+    return rdf_writer_for_raptor(stream, content_type, charset, base_uri);
+  }
+
 #ifndef DISABLE_JSONLD
   if (std::strcmp("jsonld", format->module_name) == 0) {
     return rdf_writer_for_jsonld(stream, content_type, charset, base_uri);
