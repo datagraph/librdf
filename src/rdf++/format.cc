@@ -28,12 +28,13 @@ static const format rdf_format_info[] = {
 #endif
 #ifndef DISABLE_TURTLE
   /* Turtle (.ttl) */
-  {"text/turtle",           nullptr, "ttl",    "raptor", "turtle", "turtle"},          /* official */
-  {"application/turtle",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
-  {"application/x-turtle",  nullptr, nullptr,  "raptor", "turtle", "turtle"},          /* unofficial, deprecated */
 #ifdef HAVE_LIBSERD
+  {"text/turtle",           nullptr, "ttl",    "serd",   "turtle", "turtle"},          /* official */
   {"text/turtle;serd",      nullptr, nullptr,  "serd",   "turtle", "turtle"},
 #endif
+  {"text/turtle;raptor",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
+  {"application/turtle",    nullptr, nullptr,  "raptor", "turtle", "turtle"},
+  {"application/x-turtle",  nullptr, nullptr,  "raptor", "turtle", "turtle"},          /* unofficial, deprecated */
   /* Notation3 (.n3) */
   {"text/n3",               nullptr, "n3",     "raptor", "turtle", "turtle"},          /* official */
   {"text/rdf+n3",           nullptr, nullptr,  "raptor", "turtle", "turtle"},
