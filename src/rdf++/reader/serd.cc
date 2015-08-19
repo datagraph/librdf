@@ -45,7 +45,8 @@ namespace {
     static SerdStatus error_sink(void* handle, const SerdError* error);
     static void throw_error(const char* func, SerdStatus status);
     static std::unique_ptr<char> expand_curie(const SerdEnv* env, const SerdNode* curie);
-    static std::unique_ptr<rdf::term> make_term(const SerdEnv* env, const SerdNode* node,
+    static std::unique_ptr<rdf::term> make_term(const SerdEnv* env,
+      const SerdNode* node,
       const SerdNode* node_datatype = nullptr,
       const SerdNode* node_language = nullptr);
 
@@ -72,19 +73,22 @@ rdf_reader_for_serd(FILE* const stream,
 implementation::implementation(FILE* const stream,
                                const char* const content_type,
                                const char* const charset,
-                               const char* const base_uri) {
+                               const char* const base_uri_str) {
   static_cast<void>(content_type); /* not used */
   static_cast<void>(charset);      /* not used */
 
   assert(stream);
 
-  SerdNode base_node = SERD_NODE_NULL;
-  if (base_uri) {
-    base_node = serd_node_new_uri_from_string(
-      reinterpret_cast<const std::uint8_t*>(base_uri), nullptr, nullptr);
+  if (base_uri_str) {
+    SerdURI base_uri = SERD_URI_NULL;
+    SerdNode base_uri_node = serd_node_new_uri_from_string(
+      reinterpret_cast<const std::uint8_t*>(base_uri_str), nullptr, &base_uri);
+    _env.reset(serd_env_new(&base_uri_node));
+    serd_node_free(&base_uri_node);
   }
-
-  _env.reset(serd_env_new(&base_node));
+  else {
+    _env.reset(serd_env_new(nullptr));
+  }
 
   if (!_env) {
     throw std::bad_alloc(); /* out of memory */
@@ -313,7 +317,9 @@ implementation::make_term(const SerdEnv* const env,
         break;
       }
       case SERD_URI: {
-        term.reset(new rdf::uri_reference{term_string});
+        SerdNode absolute_node = serd_env_expand_node(env, node);
+        term.reset(new rdf::uri_reference{reinterpret_cast<const char*>(absolute_node.buf)});
+        serd_node_free(&absolute_node);
         break;
       }
       case SERD_CURIE: {
