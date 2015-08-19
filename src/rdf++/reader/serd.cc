@@ -44,7 +44,8 @@ namespace {
     static SerdStatus end_sink(void* handle, const SerdNode* node);
     static SerdStatus error_sink(void* handle, const SerdError* error);
     static void throw_error(const char* func, SerdStatus status);
-    static std::unique_ptr<char> expand_curie(const SerdEnv* env, const SerdNode* curie);
+    static std::unique_ptr<char> expand_curie_or_uri(const char* type_label,
+      const SerdEnv* env, const SerdNode* curie);
     static std::unique_ptr<rdf::term> make_term(const SerdEnv* env,
       const SerdNode* node,
       const SerdNode* node_datatype = nullptr,
@@ -269,13 +270,15 @@ implementation::throw_error(const char* const symbol,
 ////////////////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<char>
-implementation::expand_curie(const SerdEnv* const env,
-                             const SerdNode* const curie) {
-  SerdNode uri = serd_env_expand_node(env, curie);
+implementation::expand_curie_or_uri(const char* const type_label,
+                                    const SerdEnv* const env,
+                                    const SerdNode* const curie_or_uri) {
+  SerdNode uri = serd_env_expand_node(env, curie_or_uri);
 
   if (uri.type == SERD_NOTHING) {
     char error_message[256];
-    std::snprintf(error_message, sizeof(error_message), "failed to expand the CURIE '%s'", curie->buf);
+    std::snprintf(error_message, sizeof(error_message),
+      "failed to expand the %s node '%s'", type_label, curie_or_uri->buf);
     throw rdf::reader_error{error_message};
   }
   assert(uri.type == SERD_URI);
@@ -298,14 +301,9 @@ implementation::make_term(const SerdEnv* const env,
       }
       case SERD_LITERAL: {
         if (node_datatype) {
-          if (node_datatype->type == SERD_CURIE) {
-            auto term_datatype = expand_curie(env, node_datatype);
-            term.reset(new rdf::typed_literal{term_string, term_datatype.get()});
-          }
-          else {
-            const auto term_datatype = reinterpret_cast<const char*>(node_datatype->buf);
-            term.reset(new rdf::typed_literal{term_string, term_datatype});
-          }
+          auto term_datatype = expand_curie_or_uri(
+            (node_datatype->type == SERD_CURIE) ? "CURIE" : "URI", env, node_datatype);
+          term.reset(new rdf::typed_literal{term_string, term_datatype.get()});
         }
         else if (node_language) {
           const char* const term_language = reinterpret_cast<const char*>(node_language->buf);
@@ -317,13 +315,12 @@ implementation::make_term(const SerdEnv* const env,
         break;
       }
       case SERD_URI: {
-        SerdNode absolute_node = serd_env_expand_node(env, node);
-        term.reset(new rdf::uri_reference{reinterpret_cast<const char*>(absolute_node.buf)});
-        serd_node_free(&absolute_node);
+        auto uri_string = expand_curie_or_uri("URI", env, node);
+        term.reset(new rdf::uri_reference{uri_string.get()});
         break;
       }
       case SERD_CURIE: {
-        auto uri_string = expand_curie(env, node);
+        auto uri_string = expand_curie_or_uri("CURIE", env, node);
         term.reset(new rdf::uri_reference{uri_string.get()});
         break;
       }
