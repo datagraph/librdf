@@ -41,7 +41,7 @@ if !DISABLE_PAJEK
 endif
 
 if !DISABLE_RDFJSON
-  librdf___la_SOURCES += writer/rdfjson.cc
+  librdf___la_SOURCES += reader/rdfjson.cc writer/rdfjson.cc
 endif
 
 if !DISABLE_TRIX

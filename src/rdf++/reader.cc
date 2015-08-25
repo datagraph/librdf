@@ -15,6 +15,10 @@
 #include "reader/nquads.h"
 #endif
 
+#ifndef DISABLE_RDFJSON
+#include "reader/rdfjson.h"
+#endif
+
 #ifndef DISABLE_TRIX
 #include "reader/trix.h"
 #endif
@@ -48,6 +52,7 @@ rdf_reader_for(FILE* const stream,
                const char* const content_type = nullptr,
                const char* const charset = nullptr,
                const char* const base_uri = nullptr) {
+
 #ifdef HAVE_LIBRAPTOR2
   /* Only the Raptor implementation supports content autodetection at the moment: */
   if (!content_type) {
@@ -72,6 +77,18 @@ rdf_reader_for(FILE* const stream,
   }
 #endif
 
+#ifndef DISABLE_RDFJSON
+  if (std::strcmp("rdfjson", format->module_name) == 0) {
+    return rdf_reader_for_rdfjson(stream, content_type, charset, base_uri);
+  }
+#endif
+
+#ifndef DISABLE_TRIX
+  if (std::strcmp("trix", format->module_name) == 0) {
+    return rdf_reader_for_trix(stream, content_type, charset, base_uri);
+  }
+#endif
+
 #ifdef HAVE_LIBRAPTOR2
   if (std::strcmp("raptor", format->module_name) == 0) {
     return rdf_reader_for_raptor(stream, content_type, charset, base_uri);
@@ -81,12 +98,6 @@ rdf_reader_for(FILE* const stream,
 #ifdef HAVE_LIBSERD
   if (std::strcmp("serd", format->module_name) == 0) {
     return rdf_reader_for_serd(stream, content_type, charset, base_uri);
-  }
-#endif
-
-#ifndef DISABLE_TRIX
-  if (std::strcmp("trix", format->module_name) == 0) {
-    return rdf_reader_for_trix(stream, content_type, charset, base_uri);
   }
 #endif
 

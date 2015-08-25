@@ -82,7 +82,7 @@ AC_DEFUN([AX_ARG_ENABLE_FORMAT], [dnl
 AX_ARG_ENABLE_FORMAT([jsonld],  [JSON-LD])  # --enable-jsonld/--disable-jsonld
 AX_ARG_ENABLE_FORMAT([nquads],  [N-Quads])  # --enable-nquads/--disable-nquads
 AX_ARG_ENABLE_FORMAT([pajek],   [Pajek])    # --enable-pajek/--disable-pajek
-AX_ARG_ENABLE_FORMAT([rdfjson], [RDF/JSON]) # --enable-rdfxml/--disable-rdfxml
+AX_ARG_ENABLE_FORMAT([rdfjson], [RDF/JSON]) # --enable-rdfjson/--disable-rdfjson
 AX_ARG_ENABLE_FORMAT([rdfxml],  [RDF/XML])  # --enable-rdfxml/--disable-rdfxml
 AX_ARG_ENABLE_FORMAT([trig],    [TriG])     # --enable-trig/--disable-trig
 AX_ARG_ENABLE_FORMAT([trix],    [TriX])     # --enable-trix/--disable-trix
