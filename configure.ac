@@ -90,18 +90,27 @@ AX_ARG_ENABLE_FORMAT([turtle],  [Turtle])   # --enable-turtle/--disable-turtle
 AX_ARG_ENABLE_FORMAT([xslt],    [XSLT])     # --enable-xslt/--disable-xslt
 
 dnl Check for libraries:
-# libserd-0 (libserd-0-0 on Ubuntu, serd on Mac OS X + MacPorts)
-AS_IF([test "x$with_serd" != "xno"], [
-  PKG_CHECK_MODULES([libserd], [serd-0 >= 0.20],
-    [AC_DEFINE([HAVE_LIBSERD], [1], [Define to 1 if you have the libserd shared library.])])
+# libyajl (libyajl-dev on Ubuntu, yajl on Mac OS X + MacPorts)
+AS_IF([test "x$enable_rdfjson" != "xno"], [
+  AC_CHECK_HEADERS([yajl/yajl_gen.h],
+    AC_SEARCH_LIBS([yajl_gen_alloc], [yajl yajl_s],
+      [AC_DEFINE([HAVE_LIBYAJL], [1], [Define to 1 if you have the libyajl shared library.])],
+      AC_MSG_ERROR([*** Shared library libyajl not found; install http://lloyd.github.io/yajl/ ***])),
+    AC_MSG_ERROR([*** Header file <yajl/yajl_gen.h> not found; install http://lloyd.github.io/yajl/ ***]))
 ])
-AM_CONDITIONAL([HAVE_LIBSERD], [test "x$libserd_LIBS" != "x"])
+AM_CONDITIONAL([HAVE_LIBYAJL], [test "x$enable_rdfjson" != "xno" && test "x$ac_res" != "xno"])
 # libraptor2 (libraptor2-dev on Ubuntu, raptor2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_rdfxml" != "xno" || test "x$enable_trig" != "xno" || test "x$enable_turtle" != "xno" || test "x$enable_xslt" != "xno"], [
   PKG_CHECK_MODULES([libraptor2], [raptor2 >= 2.0.6],
     [AC_DEFINE([HAVE_LIBRAPTOR2], [1], [Define to 1 if you have the libraptor2 shared library.])])
 ])
 AM_CONDITIONAL([HAVE_LIBRAPTOR2], [test "x$libraptor2_LIBS" != "x"])
+# libserd-0 (libserd-0-0 on Ubuntu, serd on Mac OS X + MacPorts)
+AS_IF([test "x$with_serd" != "xno"], [
+  PKG_CHECK_MODULES([libserd], [serd-0 >= 0.20],
+    [AC_DEFINE([HAVE_LIBSERD], [1], [Define to 1 if you have the libserd shared library.])])
+])
+AM_CONDITIONAL([HAVE_LIBSERD], [test "x$libserd_LIBS" != "x"])
 # libxml2 (libxml2-dev on Ubuntu, libxml2 on Mac OS X + MacPorts)
 AS_IF([test "x$enable_trix" != "xno"], [
   PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.8],
