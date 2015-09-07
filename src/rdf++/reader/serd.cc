@@ -10,6 +10,7 @@
 #include "../triple.h"
 
 #include <cassert>     /* for assert() */
+#include <cstdarg>     /* for std::vsnprintf() */
 #include <cstdio>      /* for std::fprintf(), std::snprintf() */
 #include <functional>  /* for std::function */
 #include <memory>      /* for std::unique_ptr */
@@ -223,11 +224,37 @@ implementation::end_sink(void* const handle,
 SerdStatus
 implementation::error_sink(void* const handle,
                            const SerdError* const error) {
-  if (1) std::fprintf(stderr, "%s: handle=%p error=%s\n", __func__, handle, error ? error->fmt : nullptr);
+  if (0) std::fprintf(stderr, "%s: handle=%p error=%s\n", __func__, handle, error ? error->fmt : nullptr);
 
-  // TODO: throw exception
+  if (!error) {
+    throw rdf::reader_error{"failed to parse input"};
+  }
 
-  return SERD_SUCCESS;
+  switch (error->status) {
+    case SERD_SUCCESS:        return SERD_SUCCESS;
+    case SERD_FAILURE:        return SERD_SUCCESS;
+    case SERD_ERR_UNKNOWN:    break;
+    case SERD_ERR_BAD_SYNTAX: break;
+    case SERD_ERR_BAD_ARG:    break;
+    case SERD_ERR_NOT_FOUND:  break;
+    case SERD_ERR_ID_CLASH:   break;
+    case SERD_ERR_BAD_CURIE:  break;
+    case SERD_ERR_INTERNAL:   break;
+  }
+
+  char error_detail[1024];
+  std::vsnprintf(error_detail, sizeof(error_detail), error->fmt, *error->args);
+
+  // TODO: trim "\r\n" from error_detail.
+
+  char error_message[4096];
+  std::snprintf(error_message, sizeof(error_message), "%s: %s on line %u, column %u",
+    error->filename ? reinterpret_cast<const char*>(error->filename) : "/dev/stdin",
+    error_detail, error->line, error->col);
+
+  throw rdf::reader_error{error_message};
+
+  return SERD_SUCCESS; /* never reached */
 }
 
 void
