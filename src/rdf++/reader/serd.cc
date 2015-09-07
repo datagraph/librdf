@@ -12,6 +12,7 @@
 #include <cassert>     /* for assert() */
 #include <cstdarg>     /* for std::vsnprintf() */
 #include <cstdio>      /* for std::fprintf(), std::snprintf() */
+#include <cstring>     /* for std::strrchr() */
 #include <functional>  /* for std::function */
 #include <memory>      /* for std::unique_ptr */
 #include <new>         /* for std::bad_alloc */
@@ -245,11 +246,13 @@ implementation::error_sink(void* const handle,
   char error_detail[1024];
   std::vsnprintf(error_detail, sizeof(error_detail), error->fmt, *error->args);
 
-  // TODO: trim "\r\n" from error_detail.
+  /* Trim the trailing "\n" from the Serd error detail: */
+  const auto newline_ptr = std::strrchr(error_detail, '\n');
+  if (newline_ptr) *newline_ptr = '\0';
 
   char error_message[4096];
   std::snprintf(error_message, sizeof(error_message), "%s: %s on line %u, column %u",
-    error->filename ? reinterpret_cast<const char*>(error->filename) : "/dev/stdin",
+    error->filename ? reinterpret_cast<const char*>(error->filename) : "(stream)",
     error_detail, error->line, error->col);
 
   throw rdf::reader_error{error_message};
