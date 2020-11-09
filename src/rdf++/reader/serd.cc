@@ -46,7 +46,7 @@ namespace {
     static SerdStatus end_sink(void* handle, const SerdNode* node);
     static SerdStatus error_sink(void* handle, const SerdError* error);
     static void throw_error(const char* func, SerdStatus status);
-    static std::unique_ptr<char> expand_curie_or_uri(const char* type_label,
+    static std::unique_ptr<char, void(*)(void*)> expand_curie_or_uri(const char* type_label,
       const SerdEnv* env, const SerdNode* curie);
     static std::unique_ptr<rdf::term> make_term(const SerdEnv* env,
       const SerdNode* node,
@@ -299,7 +299,7 @@ implementation::throw_error(const char* const symbol,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::unique_ptr<char>
+std::unique_ptr<char, void(*)(void*)>
 implementation::expand_curie_or_uri(const char* const type_label,
                                     const SerdEnv* const env,
                                     const SerdNode* const curie_or_uri) {
@@ -313,7 +313,10 @@ implementation::expand_curie_or_uri(const char* const type_label,
   }
   assert(uri.type == SERD_URI);
 
-  return std::unique_ptr<char>{const_cast<char*>(reinterpret_cast<const char*>(uri.buf))};
+  char *uri_copy = strdup(const_cast<char*>(reinterpret_cast<const char*>(uri.buf)));
+  serd_node_free(&uri);
+
+  return std::unique_ptr<char, void(*)(void*)>{uri_copy, free};
 }
 
 std::unique_ptr<rdf::term>
