@@ -334,9 +334,9 @@ implementation::make_term(const SerdEnv* const env,
       }
       case SERD_LITERAL: {
         if (node_datatype) {
-          std::string term_datatype = expand_curie_or_uri(
+          std::string uri_string = expand_curie_or_uri(
             (node_datatype->type == SERD_CURIE) ? "CURIE" : "URI", env, node_datatype);
-          term.reset(new rdf::typed_literal{term_string, term_datatype});
+          term.reset(new rdf::typed_literal{term_string, uri_string});
         }
         else if (node_language) {
           const char* const term_language = reinterpret_cast<const char*>(node_language->buf);
@@ -348,11 +348,13 @@ implementation::make_term(const SerdEnv* const env,
         break;
       }
       case SERD_URI: {
-        term.reset(new rdf::uri_reference{expand_curie_or_uri("URI", env, node)});
+        std::string uri_string = expand_curie_or_uri("URI", env, node);
+        term.reset(new rdf::uri_reference{uri_string});
         break;
       }
       case SERD_CURIE: {
-        term.reset(new rdf::uri_reference{expand_curie_or_uri("CURIE", env, node)});
+        std::string uri_string = expand_curie_or_uri("CURIE", env, node);
+        term.reset(new rdf::uri_reference{uri_string});
         break;
       }
       case SERD_BLANK: {
